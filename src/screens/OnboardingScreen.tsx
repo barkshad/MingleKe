@@ -32,6 +32,7 @@ export default function OnboardingScreen() {
   });
   const [isPaying, setIsPaying] = useState(false);
   const [paymentDone, setPaymentDone] = useState(false);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const { user, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
@@ -298,19 +299,51 @@ export default function OnboardingScreen() {
                           <X size={12} />
                         </button>
                       </>
+                    ) : uploadingIndex === idx ? (
+                      <div className="flex flex-col items-center justify-center p-2 text-center h-full">
+                         <div className="animate-[spin_2s_linear_infinite] rounded-full h-6 w-6 border-t-2 border-b-2 border-primary-light shadow-[0_0_10px_rgba(191,97,255,0.5)] mb-2"></div>
+                         <span className="text-[10px] text-primary-light font-bold">Uploading...</span>
+                      </div>
                     ) : (
-                      <button 
-                        onClick={() => {
-                          const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name || 'mingle'}${idx}${Date.now()}`;
-                          const newPhotos = [...data.photos];
-                          newPhotos[idx] = url;
-                          setData({ ...data, photos: newPhotos });
-                        }}
-                        className="text-primary-main flex flex-col items-center p-2 text-center"
-                      >
-                        <Camera size={24} />
-                        <span className="text-[10px] mt-1 font-bold">Upload</span>
-                      </button>
+                      <label className="cursor-pointer text-primary-main flex flex-col items-center p-2 text-center w-full h-full justify-center hover:bg-white/5 transition-colors rounded-xl">
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setUploadingIndex(idx);
+                              const reader = new FileReader();
+                              reader.onloadend = async () => {
+                                const base64 = reader.result as string;
+                                try {
+                                  // Indicate loading (you could add a dedicated loading state array for UI)
+                                  const res = await fetch('/api/upload', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ file: base64 })
+                                  });
+                                  const json = await res.json();
+                                  if (json.url) {
+                                    const newPhotos = [...data.photos];
+                                    newPhotos[idx] = json.url;
+                                    setData({ ...data, photos: newPhotos });
+                                  }
+                                } catch (error) {
+                                  console.error("Upload failed", error);
+                                  alert("Failed to upload image.");
+                                } finally {
+                                  setUploadingIndex(null);
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        <Camera size={24} className="text-primary-light mb-1 drop-shadow-[0_0_8px_rgba(191,97,255,0.5)]" />
+                        <span className="text-[10px] font-bold text-white/50 tracking-widest uppercase">Upload</span>
+                      </label>
                     )}
                   </div>
                 ))}

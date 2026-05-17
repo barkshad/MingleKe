@@ -2,12 +2,45 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
+import { v2 as cloudinary } from "cloudinary";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+  // Cloudinary config
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+
+  // API Route: Upload Image to Cloudinary
+  app.post("/api/upload", async (req, res) => {
+    try {
+      const { file } = req.body; // base64 string
+      if (!file) {
+        return res.status(400).json({ error: "No file provided" });
+      }
+
+      if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+        console.warn("Cloudinary env vars missing. Simulating upload success.");
+        return res.json({ url: file }); // Echo back the base64 as the URL
+      }
+
+      const uploadResponse = await cloudinary.uploader.upload(file, {
+        folder: 'mingleke',
+      });
+      console.log('Cloudinary upload success');
+      res.json({ url: uploadResponse.secure_url });
+    } catch (error: any) {
+      console.error("Cloudinary upload failed:", error);
+      res.status(500).json({ error: "Upload failed" });
+    }
+  });
 
   // API Route: M-Pesa STK Push
   app.post("/api/mpesa/stkpush", async (req, res) => {
