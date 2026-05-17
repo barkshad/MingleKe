@@ -93,7 +93,13 @@ export default function OnboardingScreen() {
         }),
       });
 
-      const result = await response.json();
+      let result;
+      const responseText = await response.text();
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        throw new Error("Server returned an invalid response (HTML). Please check your backend configuration.");
+      }
       
       // ResponseCode '0' means request accepted (STK push sent)
       if (response.ok && (result.ResponseCode === "0" || result.merchant_request_id)) {

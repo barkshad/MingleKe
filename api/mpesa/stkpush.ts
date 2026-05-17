@@ -24,7 +24,12 @@ export default async function handler(req: any, res: any) {
     // Lipana.dev STK Push via Payment Links
     // Format phone as +254...
     const formattedPhone = '+' + phoneNumber.replace('+', '').replace(/^0/, '254');
-    const slug = process.env.LIPANA_PAYMENT_LINK_SLUG || 'mingleke';
+    
+    let slug = process.env.LIPANA_PAYMENT_LINK_SLUG || 'mingleke';
+    // If the slug is provided as a full URL, extract just the slug
+    if (slug.includes('/')) {
+      slug = slug.split('/').pop() || 'mingleke';
+    }
     
     const response = await axios.post(`https://api.lipana.dev/api/payment-links/public/${slug}/pay`, {
       phone: formattedPhone,
@@ -39,10 +44,15 @@ export default async function handler(req: any, res: any) {
     console.log("Lipana Response:", response.data);
     res.status(200).json(response.data);
   } catch (error: any) {
-    console.error("Lipana error details:", error.response?.data || error.message);
+    const errorMsg = error.response?.data?.message || error.message || "Unknown error";
+    const errorDetails = typeof error.response?.data === 'string' && error.response.data.includes('<html') 
+      ? "Received HTML error page from payment gateway (invalid endpoint or configuration)."
+      : (error.response?.data || error.message);
+      
+    console.error("Lipana error details:", errorDetails);
     res.status(500).json({ 
-      error: "Payment request failed", 
-      details: error.response?.data || error.message 
+      error: errorMsg, 
+      details: errorDetails 
     });
   }
 }
