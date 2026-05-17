@@ -1,0 +1,17 @@
+{
+  "name": "MingleKE",
+  "short_name": "MingleKE",
+  "description": "Discover meaningful connections in Kenya.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070308",
+  "theme_color": "#bf61ff",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

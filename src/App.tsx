@@ -8,12 +8,14 @@ import DiscoveryScreen from './screens/DiscoveryScreen';
 import MatchesScreen from './screens/MatchesScreen';
 import ChatScreen from './screens/ChatScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import { PwaPrompt } from './components/PwaPrompt';
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <div className="mobile-container">
+          <PwaPrompt />
           <Routes>
             {/* Public Routes */}
             <Route element={<PublicRoute />}>
