@@ -2,52 +2,12 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
-import { v2 as cloudinary } from "cloudinary";
-import multer from "multer";
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-  // Cloudinary config
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-
-  // API Route: Upload Image to Cloudinary
-  app.post("/api/upload", upload.single('file'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file provided" });
-      }
-
-      if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-        console.warn("Cloudinary env vars missing. using fallback image url.");
-        const seed = Math.random().toString(36).substring(7);
-        return res.json({ url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}` });
-      }
-
-      const b64 = Buffer.from(req.file.buffer).toString('base64');
-      const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
-      
-      const uploadResponse = await cloudinary.uploader.upload(dataURI, {
-        folder: 'mingleke',
-      });
-      console.log('Cloudinary upload success');
-      res.json({ url: uploadResponse.secure_url });
-    } catch (error: any) {
-      console.error("Cloudinary upload failed:", error);
-      res.status(500).json({ error: error.message || "Upload failed" });
-    }
-  });
 
   // API Route: M-Pesa STK Push
   app.post("/api/mpesa/stkpush", async (req, res) => {

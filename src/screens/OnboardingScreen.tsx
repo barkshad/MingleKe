@@ -194,17 +194,24 @@ export default function OnboardingScreen() {
                 <div className="flex glass-panel border border-white/20 p-5 rounded-[24px] items-center gap-4">
                   <Calendar className="text-primary-light" size={28} />
                   <input
-                    type="date"
+                    type="text"
+                    placeholder="YYYY-MM-DD"
                     value={data.birthday}
-                    onChange={(e) => setData({ ...data, birthday: e.target.value })}
-                    className="bg-transparent flex-1 focus:outline-hidden font-bold text-xl text-white color-scheme-dark"
+                    onChange={(e) => {
+                      let val = e.target.value.replace(/[^0-9]/g, '');
+                      if (val.length > 4) val = val.slice(0, 4) + '-' + val.slice(4);
+                      if (val.length > 7) val = val.slice(0, 7) + '-' + val.slice(7);
+                      if (val.length > 10) val = val.slice(0, 10);
+                      setData({ ...data, birthday: val });
+                    }}
+                    className="bg-transparent flex-1 focus:outline-hidden font-bold text-xl text-white placeholder:text-white/30 tracking-widest"
                   />
                 </div>
                 <p className="text-sm text-white/50 px-2">Your profile shows your age, not your birthday.</p>
                 <button
-                  disabled={!data.birthday || calculateAge(data.birthday) < 18}
+                  disabled={data.birthday.length !== 10 || isNaN(calculateAge(data.birthday)) || calculateAge(data.birthday) < 18}
                   onClick={nextStep}
-                  className="w-full btn-primary disabled:opacity-50 mt-4"
+                  className="w-full btn-primary disabled:opacity-50 mt-4 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -315,20 +322,34 @@ export default function OnboardingScreen() {
                             if (file) {
                               setUploadingIndex(idx);
                               try {
+                                const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+                                const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+                                if (!cloudName || !uploadPreset) {
+                                  console.warn("Cloudinary env vars missing. using fallback image url.");
+                                  const seed = Math.random().toString(36).substring(7);
+                                  const fallbackUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+                                  const newPhotos = [...data.photos];
+                                  newPhotos[idx] = fallbackUrl;
+                                  setData({ ...data, photos: newPhotos });
+                                  return;
+                                }
+
                                 const formData = new FormData();
                                 formData.append('file', file);
+                                formData.append('upload_preset', uploadPreset);
                                 
-                                const res = await fetch('/api/upload', {
+                                const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                                   method: 'POST',
                                   body: formData
                                 });
                                 const json = await res.json();
                                 if (!res.ok) {
-                                  throw new Error(json.error || 'Upload failed');
+                                  throw new Error(json.error?.message || 'Upload failed');
                                 }
-                                if (json.url) {
+                                if (json.secure_url) {
                                   const newPhotos = [...data.photos];
-                                  newPhotos[idx] = json.url;
+                                  newPhotos[idx] = json.secure_url;
                                   setData({ ...data, photos: newPhotos });
                                 }
                               } catch (error) {
