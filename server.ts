@@ -27,8 +27,9 @@ async function startServer() {
       }
 
       if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-        console.warn("Cloudinary env vars missing. Simulating upload success.");
-        return res.json({ url: file }); // Echo back the base64 as the URL
+        console.warn("Cloudinary env vars missing. using fallback image url.");
+        const seed = Math.random().toString(36).substring(7);
+        return res.json({ url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}` });
       }
 
       const uploadResponse = await cloudinary.uploader.upload(file, {
@@ -38,7 +39,7 @@ async function startServer() {
       res.json({ url: uploadResponse.secure_url });
     } catch (error: any) {
       console.error("Cloudinary upload failed:", error);
-      res.status(500).json({ error: "Upload failed" });
+      res.status(500).json({ error: error.message || "Upload failed" });
     }
   });
 

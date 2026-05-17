@@ -325,6 +325,9 @@ export default function OnboardingScreen() {
                                     body: JSON.stringify({ file: base64 })
                                   });
                                   const json = await res.json();
+                                  if (!res.ok) {
+                                    throw new Error(json.error || 'Upload failed');
+                                  }
                                   if (json.url) {
                                     const newPhotos = [...data.photos];
                                     newPhotos[idx] = json.url;
