@@ -1,0 +1,6 @@
+{
+  "name": "MingleKE",
+  "description": "Mobile-first dating and social discovery platform for young adults in Kenya. Focus on safe, meaningful connections with local verification.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- User Validation ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'age', 'gender', 'interestedIn']) &&
+             data.uid == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.age is int && data.age >= 18 && data.age <= 100 &&
+             data.gender in ['male', 'female', 'other'] &&
+             data.interestedIn in ['men', 'women', 'everyone'] &&
+             (data.get('bio', '') is string && data.bio.size() <= 500) &&
+             (data.get('paymentStatus', 'none') in ['pending', 'completed', 'none']);
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn(); // Privacy note: Standard for dating apps to list nearby users
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'bio', 'age', 'gender', 'interestedIn', 'photos', 'location', 'interests', 'lastActive', 'paymentStatus', 'paymentReference']);
+      allow delete: if false; // MVP: No self-deletion yet
+    }
+
+    // --- Like Validation ---
+    function isValidLike(data) {
+      return data.keys().hasAll(['senderId', 'receiverId', 'createdAt']) &&
+             data.senderId == request.auth.uid &&
+             isValidId(data.receiverId) &&
+             data.createdAt == request.time;
+    }
+
+    match /likes/{likeId} {
+      allow get: if isSignedIn() && (isOwner(existing().senderId) || isOwner(existing().receiverId));
+      allow list: if isSignedIn() && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid);
+      allow create: if isSignedIn() && isValidLike(incoming()) && isValidId(likeId);
+      allow update, delete: if false;
+    }
+
+    // --- Match Validation ---
+    function isValidMatch(data) {
+      return data.keys().hasAll(['users', 'matchedAt']) &&
+             data.users is list && data.users.size() == 2 &&
+             request.auth.uid in data.users &&
+             data.matchedAt == request.time;
+    }
+
+    match /matches/{matchId} {
+      allow get: if isSignedIn() && request.auth.uid in existing().users;
+      allow list: if isSignedIn() && request.auth.uid in resource.data.users;
+      allow create: if isSignedIn() && isValidMatch(incoming()) && isValidId(matchId);
+      allow update: if isSignedIn() && request.auth.uid in existing().users &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['lastMessage', 'lastMessageAt']);
+      allow delete: if false;
+
+      // --- Message Validation ---
+      function isValidMessage(data, mId) {
+        return data.keys().hasAll(['matchId', 'senderId', 'text', 'createdAt']) &&
+               data.matchId == mId &&
+               data.senderId == request.auth.uid &&
+               data.text is string && data.text.size() > 0 && data.text.size() <= 5000 &&
+               data.createdAt == request.time;
+      }
+
+      match /messages/{messageId} {
+        allow list, get: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users;
+        allow create: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users && 
+                       isValidMessage(incoming(), matchId);
+        allow update: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.users &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['seen']);
+        allow delete: if false;
+      }
+    }
+  }
+}

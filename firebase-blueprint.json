@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and metadata",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "age": { "type": "integer" },
+        "gender": { "type": "string", "enum": ["male", "female", "other"] },
+        "interestedIn": { "type": "string", "enum": ["men", "women", "everyone"] },
+        "bio": { "type": "string" },
+        "photos": { "type": "array", "items": { "type": "string" } },
+        "location": { "type": "object" },
+        "interests": { "type": "array", "items": { "type": "string" } },
+        "paymentStatus": { "type": "string", "enum": ["pending", "completed", "none"] },
+        "paymentReference": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastActive": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "age", "gender", "interestedIn"]
+    },
+    "Like": {
+      "title": "Like",
+      "description": "A like between two users",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["senderId", "receiverId", "createdAt"]
+    },
+    "Match": {
+      "title": "Match",
+      "description": "A mutual like/match between two users",
+      "type": "object",
+      "properties": {
+        "users": { "type": "array", "items": { "type": "string" } },
+        "matchedAt": { "type": "string", "format": "date-time" },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["users", "matchedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A chat message within a match",
+      "type": "object",
+      "properties": {
+        "matchId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "seen": { "type": "boolean" }
+      },
+      "required": ["matchId", "senderId", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles"
+    },
+    "/likes/{likeId}": {
+      "schema": "Like",
+      "description": "Collection of swipe likes"
+    },
+    "/matches/{matchId}": {
+      "schema": "Match",
+      "description": "Collection of mutual matches"
+    },
+    "/matches/{matchId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Subcollection of messages within a match"
+    }
+  }
+}
