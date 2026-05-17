@@ -122,7 +122,7 @@ export default function OnboardingScreen() {
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${(step / 9) * 100}%` }}
-          className="h-full bg-linear-to-r from-primary-main to-secondary-main shadow-[0_0_10px_rgba(191,97,255,0.8)]"
+          className="h-full "
         />
       </div>
 
@@ -136,7 +136,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-black text-white drop-shadow-md">What's your gender?</h1>
+              <h1 className="text-4xl font-bold text-white ">What's your gender?</h1>
               <div className="grid grid-cols-1 gap-4">
                 {['male', 'female', 'other'].map((g) => (
                   <button
@@ -144,7 +144,7 @@ export default function OnboardingScreen() {
                     onClick={() => { setData({ ...data, gender: g as any }); nextStep(); }}
                     className={cn(
                       "w-full p-6 rounded-[24px] border-2 text-left transition-all duration-300 flex items-center justify-between glass-panel",
-                      data.gender === g ? "border-primary-main bg-white/10 text-primary-light shadow-[0_0_20px_rgba(191,97,255,0.3)]" : "border-white/10 hover:bg-white/5"
+                      data.gender === g ? "border-white bg-white/10 text-gray-400 " : "border-white/10 hover:bg-white/5"
                     )}
                   >
                     <span className="capitalize font-bold text-xl">{g}</span>
@@ -163,7 +163,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-black text-white drop-shadow-md">Who are you interested in?</h1>
+              <h1 className="text-4xl font-bold text-white ">Who are you interested in?</h1>
               <div className="grid grid-cols-1 gap-4">
                 {['men', 'women', 'everyone'].map((pref) => (
                   <button
@@ -171,7 +171,7 @@ export default function OnboardingScreen() {
                     onClick={() => { setData({ ...data, interestedIn: pref as any }); nextStep(); }}
                     className={cn(
                       "w-full p-6 rounded-[24px] border-2 text-left transition-all duration-300 flex items-center justify-between glass-panel",
-                      data.interestedIn === pref ? "border-primary-main bg-white/10 text-primary-light shadow-[0_0_20px_rgba(191,97,255,0.3)]" : "border-white/10 hover:bg-white/5"
+                      data.interestedIn === pref ? "border-white bg-white/10 text-gray-400 " : "border-white/10 hover:bg-white/5"
                     )}
                   >
                     <span className="capitalize font-bold text-xl">{pref}</span>
@@ -189,10 +189,10 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-black text-white drop-shadow-md">When is your birthday?</h1>
+              <h1 className="text-4xl font-bold text-white ">When is your birthday?</h1>
               <div className="space-y-4">
                 <div className="flex glass-panel border border-white/20 p-5 rounded-[24px] items-center gap-4">
-                  <Calendar className="text-primary-light" size={28} />
+                  <Calendar className="text-gray-400" size={28} />
                   <input
                     type="text"
                     placeholder="YYYY-MM-DD"
@@ -227,14 +227,14 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-black text-white drop-shadow-md">What's your name?</h1>
+              <h1 className="text-4xl font-bold text-white ">What's your name?</h1>
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Your First Name"
                   value={data.name}
                   onChange={(e) => setData({ ...data, name: e.target.value })}
-                  className="w-full p-5 glass-panel rounded-[24px] border border-white/20 focus:border-primary-main focus:ring-2 focus:ring-primary-main/30 font-bold text-xl text-white placeholder:text-white/30 transition-all outline-hidden"
+                  className="w-full p-5 glass-panel rounded-[24px] border border-white/20 focus:border-white focus:ring-2 focus:ring-white/20 font-bold text-xl text-white placeholder:text-white/30 transition-all outline-hidden"
                 />
                 <button
                   disabled={!data.name}
@@ -254,13 +254,13 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-black text-white drop-shadow-md">Where are you located?</h1>
+              <h1 className="text-4xl font-bold text-white ">Where are you located?</h1>
               <div className="space-y-4">
                 <button
                   onClick={() => { setData({ ...data, location: { city: 'Nairobi', lat: -1.286389, lng: 36.817223 } }); nextStep(); }}
-                  className="w-full p-6 rounded-[24px] border border-primary-light bg-primary-main/20 text-white flex items-center justify-center gap-3 font-bold text-lg shadow-[0_0_30px_rgba(191,97,255,0.2)] hover:bg-primary-main/30 transition-all"
+                  className="w-full p-6 rounded-[24px] border border-white bg-white/10 text-white flex items-center justify-center gap-3 font-bold text-lg  hover:bg-white/10 transition-all"
                 >
-                  <MapPin size={24} className="text-primary-light" />
+                  <MapPin size={24} className="text-gray-400" />
                   Detect My Location
                 </button>
                 <div className="text-center text-sm font-bold text-white/30 uppercase tracking-widest py-2">or</div>
@@ -268,7 +268,7 @@ export default function OnboardingScreen() {
                   <button
                     key={city}
                     onClick={() => { setData({ ...data, location: { city, lat: 0, lng: 0 } }); nextStep(); }}
-                    className="w-full p-5 rounded-[20px] border border-white/10 glass-panel text-left hover:border-primary-main transition-colors font-bold text-lg text-white/80 hover:text-white"
+                    className="w-full p-5 rounded-[20px] border border-white/10 glass-panel text-left hover:border-white transition-colors font-bold text-lg text-white/80 hover:text-white"
                   >
                     {city}
                   </button>
@@ -285,8 +285,8 @@ export default function OnboardingScreen() {
               className="space-y-6"
             >
               <div className="flex justify-between items-end">
-                <h1 className="text-4xl font-black text-white drop-shadow-md">Add 3 photos</h1>
-                <span className="text-lg font-bold text-primary-light">{data.photos.filter(p => !!p).length}/3</span>
+                <h1 className="text-4xl font-bold text-white ">Add 3 photos</h1>
+                <span className="text-lg font-bold text-gray-400">{data.photos.filter(p => !!p).length}/3</span>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {[0, 1, 2].map((idx) => (
@@ -301,18 +301,18 @@ export default function OnboardingScreen() {
                             newPhotos[idx] = '';
                             setData({ ...data, photos: newPhotos });
                           }}
-                          className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white rounded-full p-1.5 shadow-lg active:scale-90"
+                          className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white rounded-full p-1.5  active:scale-90"
                         >
                           <X size={12} />
                         </button>
                       </>
                     ) : uploadingIndex === idx ? (
                       <div className="flex flex-col items-center justify-center p-2 text-center h-full">
-                         <div className="animate-[spin_2s_linear_infinite] rounded-full h-6 w-6 border-t-2 border-b-2 border-primary-light shadow-[0_0_10px_rgba(191,97,255,0.5)] mb-2"></div>
-                         <span className="text-[10px] text-primary-light font-bold">Uploading...</span>
+                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mx-auto"></div>
+                         <span className="text-[10px] text-gray-400 font-bold">Uploading...</span>
                       </div>
                     ) : (
-                      <label className="cursor-pointer text-primary-main flex flex-col items-center p-2 text-center w-full h-full justify-center hover:bg-white/5 transition-colors rounded-xl">
+                      <label className="cursor-pointer text-white flex flex-col items-center p-2 text-center w-full h-full justify-center hover:bg-white/5 transition-colors rounded-xl">
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -326,13 +326,7 @@ export default function OnboardingScreen() {
                                 const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
                                 if (!cloudName || !uploadPreset) {
-                                  console.warn("Cloudinary env vars missing. using fallback image url.");
-                                  const seed = Math.random().toString(36).substring(7);
-                                  const fallbackUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-                                  const newPhotos = [...data.photos];
-                                  newPhotos[idx] = fallbackUrl;
-                                  setData({ ...data, photos: newPhotos });
-                                  return;
+                                  throw new Error("Cloudinary environment variables (VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET) are missing. Please configure them in your deployment environment (e.g., Vercel).");
                                 }
 
                                 const formData = new FormData();
@@ -352,9 +346,9 @@ export default function OnboardingScreen() {
                                   newPhotos[idx] = json.secure_url;
                                   setData({ ...data, photos: newPhotos });
                                 }
-                              } catch (error) {
+                              } catch (error: any) {
                                 console.error("Upload failed", error);
-                                alert("Failed to upload image.");
+                                alert(error.message || "Failed to upload image.");
                               } finally {
                                 setUploadingIndex(null);
                                 e.target.value = ''; // allow uploading the same file again
@@ -362,7 +356,7 @@ export default function OnboardingScreen() {
                             }
                           }}
                         />
-                        <Camera size={24} className="text-primary-light mb-1 drop-shadow-[0_0_8px_rgba(191,97,255,0.5)]" />
+                        <Camera size={24} className="text-gray-400 mb-1 " />
                         <span className="text-[10px] font-bold text-white/50 tracking-widest uppercase">Upload</span>
                       </label>
                     )}
@@ -387,12 +381,12 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-black text-white drop-shadow-md">About you</h1>
+              <h1 className="text-4xl font-bold text-white ">About you</h1>
               <textarea
                 placeholder="Write a short bio..."
                 value={data.bio}
                 onChange={(e) => setData({ ...data, bio: e.target.value })}
-                className="w-full h-48 p-5 glass-panel rounded-[24px] border border-white/20 focus:border-primary-main focus:ring-2 focus:ring-primary-main/30 resize-none font-medium text-lg text-white placeholder:text-white/30 transition-all outline-hidden"
+                className="w-full h-48 p-5 glass-panel rounded-[24px] border border-white/20 focus:border-white focus:ring-2 focus:ring-white/20 resize-none font-medium text-lg text-white placeholder:text-white/30 transition-all outline-hidden"
               />
               <button
                 onClick={nextStep}
@@ -412,37 +406,37 @@ export default function OnboardingScreen() {
             >
               {data.gender === 'female' ? (
                 <>
-                  <div className="glass-panel p-8 rounded-[32px] text-center space-y-4 border border-primary-main/30 bg-primary-main/10 shadow-[0_0_50px_rgba(191,97,255,0.15)] relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-main/20 rounded-full blur-[40px] -z-10" />
-                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-main/20 rounded-full blur-[40px] -z-10" />
+                  <div className="glass-panel p-8 rounded-[32px] text-center space-y-4 border border-white/30 bg-white/10  relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-[40px] -z-10" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-[40px] -z-10" />
                     
-                    <div className="w-20 h-20 bg-linear-to-br from-primary-main to-secondary-main rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(255,77,141,0.4)]">
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ">
                       <CheckCircle className="text-white" size={40} />
                     </div>
-                    <h2 className="text-3xl font-black text-white drop-shadow-md">Verify Your Access</h2>
+                    <h2 className="text-3xl font-bold text-white ">Verify Your Access</h2>
                     <p className="text-white/70 text-base font-medium">
                       MingleKE ensures a high-quality community. One-time verification fee:
                     </p>
-                    <div className="text-5xl font-black gradient-text py-2 drop-shadow-lg">KES 100</div>
+                    <div className="text-5xl font-bold gradient-text py-2 ">KES 100</div>
                   </div>
                   
                   <div className="space-y-4 pt-4">
                     <div className="glass-panel border border-white/10 p-5 rounded-[24px] flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(34,197,94,0.4)]">M</div>
+                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white font-bold text-xl ">M</div>
                         <div>
                           <p className="font-bold text-white text-lg">M-Pesa STK</p>
                           <p className="text-sm text-white/50 font-medium">Push to {user?.phoneNumber || 'registered number'}</p>
                         </div>
                       </div>
-                      <div className="w-6 h-6 rounded-full border-2 border-primary-main flex items-center justify-center">
-                        <div className="w-3 h-3 bg-primary-main rounded-full" />
+                      <div className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
+                        <div className="w-3 h-3 bg-white text-black rounded-full" />
                       </div>
                     </div>
 
                     {isPaying ? (
                       <div className="flex flex-col items-center py-4">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-main mb-4"></div>
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white mb-4"></div>
                         <p className="text-sm font-medium animate-pulse">Waiting for M-Pesa approval...</p>
                       </div>
                     ) : paymentDone ? (
@@ -463,10 +457,10 @@ export default function OnboardingScreen() {
                 </>
               ) : (
                 <div className="space-y-6 text-center py-12">
-                   <div className="w-24 h-24 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(34,197,94,0.3)]">
+                   <div className="w-24 h-24 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 ">
                     <CheckCircle size={56} />
                   </div>
-                  <h1 className="text-4xl font-black text-white drop-shadow-md">All set!</h1>
+                  <h1 className="text-4xl font-bold text-white ">All set!</h1>
                   <p className="text-white/60 text-lg">You're ready to find your perfect match on MingleKE.</p>
                   <button onClick={nextStep} className="w-full btn-primary mt-8">Continue</button>
                 </div>
@@ -486,7 +480,7 @@ export default function OnboardingScreen() {
                   animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
                   transition={{ repeat: Infinity, duration: 4 }}
                 >
-                  <Heart size={100} className="text-secondary-main fill-secondary-main" />
+                  <Heart size={100} className="text-white fill-white" />
                 </motion.div>
                 {[...Array(5)].map((_, i) => (
                    <motion.div
@@ -496,11 +490,11 @@ export default function OnboardingScreen() {
                     transition={{ repeat: Infinity, duration: 2, delay: i * 0.4 }}
                     className="absolute top-1/2 left-1/2"
                    >
-                     <Heart size={20} className="text-primary-main fill-primary-main" />
+                     <Heart size={20} className="text-white fill-white" />
                    </motion.div>
                 ))}
               </div>
-              <h1 className="text-5xl font-black text-white drop-shadow-lg">Welcome to<br/>MingleKE</h1>
+              <h1 className="text-5xl font-bold text-white ">Welcome to<br/>MingleKE</h1>
               <p className="text-white/70 text-xl max-w-[260px]">Your journey to meaningful social discovery starts now.</p>
               <button onClick={handleComplete} className="w-full btn-primary h-16 text-xl mt-6">Start Mingling</button>
             </motion.div>

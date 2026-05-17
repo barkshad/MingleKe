@@ -44,15 +44,15 @@ export default function LandingScreen() {
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="w-32 h-32 rounded-3xl mb-8 flex items-center justify-center bg-linear-to-br from-primary-main to-secondary-main shadow-[0_0_50px_rgba(255,77,141,0.5)]"
+          className="w-32 h-32 rounded-3xl mb-8 flex items-center justify-center "
         >
-          <Heart size={64} fill="white" className="text-white drop-shadow-md" />
+          <Heart size={64} fill="white" className="text-white " />
         </motion.div>
         
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-6xl font-black mb-3 tracking-tighter"
+          className="text-6xl font-bold mb-3 tracking-tighter"
         >
           MingleKE
         </motion.h1>
@@ -98,7 +98,7 @@ export default function LandingScreen() {
 
               <button
                 onClick={handleGoogleLogin}
-                className="w-full glass-panel text-white font-bold py-4 rounded-full flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-all"
+                className="w-full glass-panel text-white font-bold py-4 rounded-full flex items-center justify-center gap-3  active:scale-[0.98] transition-all"
               >
                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 bg-white p-0.5 rounded-full" />
                 Sign in with Google
@@ -111,7 +111,7 @@ export default function LandingScreen() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               onSubmit={handleEmailAuth}
-              className="glass-panel p-6 rounded-[32px] space-y-6 shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
+              className="glass-panel p-6 rounded-[32px] space-y-6  relative overflow-hidden"
             >
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold">{view === 'email-login' ? 'Welcome Back' : 'Get Started'}</h2>
@@ -145,7 +145,7 @@ export default function LandingScreen() {
 
               <button
                 type="submit"
-                className="w-full bg-white text-primary-main font-bold py-4 rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-white text-white font-bold py-4 rounded-2xl  active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 {view === 'email-login' ? 'Log In' : 'Sign Up'}
                 <ArrowRight size={20} />

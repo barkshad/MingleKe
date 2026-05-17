@@ -103,17 +103,17 @@ export default function ChatScreen() {
           <ChevronLeft size={32} />
         </button>
         <div className="flex-1 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+          <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden ">
             {otherUser && <img src={otherUser.photos[0]} alt={otherUser.name} className="w-full h-full object-cover" />}
           </div>
           <div>
             <h2 className="font-bold text-white text-xl leading-tight">{otherUser?.name || '...'}</h2>
-            <p className="text-[9px] text-teal-400 font-bold uppercase tracking-[0.2em] drop-shadow-[0_0_5px_rgba(45,212,191,0.5)]">Online</p>
+            <p className="text-[9px] text-teal-400 font-bold uppercase tracking-[0.2em] ">Online</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-3 glass-panel rounded-full text-white/70 hover:text-primary-light active:scale-95 transition-all"><Phone size={18} /></button>
-          <button className="p-3 glass-panel rounded-full text-white/70 hover:text-primary-light active:scale-95 transition-all"><Video size={18} /></button>
+          <button className="p-3 glass-panel rounded-full text-white/70 hover:text-gray-400 active:scale-95 transition-all"><Phone size={18} /></button>
+          <button className="p-3 glass-panel rounded-full text-white/70 hover:text-gray-400 active:scale-95 transition-all"><Video size={18} /></button>
         </div>
       </header>
 
@@ -121,7 +121,7 @@ export default function ChatScreen() {
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {loading ? (
           <div className="flex-1 flex items-center justify-center p-20">
-            <div className="animate-[spin_2s_linear_infinite] rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-main shadow-[0_0_15px_rgba(191,97,255,0.5)]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white mx-auto"></div>
           </div>
         ) : (
           <AnimatePresence>
@@ -138,9 +138,9 @@ export default function ChatScreen() {
                   )}
                 >
                   <div className={cn(
-                    "px-5 py-3.5 rounded-[24px] text-base font-medium shadow-md max-w-full backdrop-blur-md",
+                    "px-5 py-3.5 rounded-[24px] text-base font-medium  max-w-full backdrop-blur-md",
                     isMine 
-                      ? "bg-linear-to-br from-primary-main to-secondary-main text-white rounded-br-sm shadow-[0_5px_20px_rgba(191,97,255,0.3)]" 
+                      ? "text-white rounded-br-sm " 
                       : "glass-panel border border-white/10 text-white rounded-bl-sm"
                   )}>
                     {msg.text}
@@ -160,7 +160,7 @@ export default function ChatScreen() {
 
       {/* Input */}
       <div className="p-4 bg-transparent pb-8">
-        <form onSubmit={handleSend} className="glass-panel p-2 rounded-full border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+        <form onSubmit={handleSend} className="glass-panel p-2 rounded-full border border-white/20 ">
           <div className="flex items-center gap-2 bg-black/20 rounded-full px-4 py-1">
             <input
               type="text"
@@ -172,7 +172,7 @@ export default function ChatScreen() {
             <button 
               type="submit" 
               disabled={!inputText.trim()}
-              className="w-12 h-12 bg-linear-to-br from-primary-main to-secondary-main rounded-full flex items-center justify-center text-white disabled:opacity-30 disabled:grayscale transition-all active:scale-90 shadow-[0_0_15px_rgba(191,97,255,0.4)]"
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white disabled:opacity-30 disabled:grayscale transition-all active:scale-90 "
             >
               <Send size={20} className="ml-1" />
             </button>

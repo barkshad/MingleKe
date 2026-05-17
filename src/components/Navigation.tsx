@@ -13,7 +13,7 @@ export default function Navigation() {
 
   return (
     <div className="absolute bottom-6 inset-x-0 px-6 z-50 pointer-events-none">
-      <nav className="glass-panel h-[72px] rounded-full flex items-center justify-around px-2 pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+      <nav className="glass-panel h-[72px] rounded-full flex items-center justify-around px-2 pointer-events-auto ">
         {navItems.map((item, idx) => (
           <NavLink
             key={idx}
@@ -32,7 +32,7 @@ export default function Navigation() {
                 <item.icon 
                   size={22} 
                   strokeWidth={isActive ? 2.5 : 2} 
-                  className={isActive ? 'text-primary-main drop-shadow-[0_0_10px_rgba(191,97,255,0.8)]' : ''}
+                  className={isActive ? 'text-white ' : ''}
                 />
                 <span className={cn(
                   "text-[9px] font-bold uppercase tracking-widest transition-all duration-300 mt-1",

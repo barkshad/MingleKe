@@ -138,8 +138,8 @@ export default function DiscoveryScreen() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
         <div className="relative">
-          <div className="w-24 h-24 rounded-full border-4 border-primary-main/20 border-t-primary-main animate-spin" />
-          <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary-main animate-pulse" />
+          <div className="w-24 h-24 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+          <Heart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white animate-pulse" />
         </div>
         <p className="text-gray-400 font-medium">Finding people nearby...</p>
       </div>
@@ -152,11 +152,11 @@ export default function DiscoveryScreen() {
     <div className="flex-1 flex flex-col pt-4 px-4 overflow-hidden relative z-10">
       {/* Header */}
       <header className="flex items-center justify-between px-2 mb-4">
-        <h1 className="text-2xl font-black text-white flex items-center gap-2 drop-shadow-md">
-          <Heart className="fill-primary-main text-primary-main" size={24} />
+        <h1 className="text-2xl font-bold text-white flex items-center gap-2 ">
+          <Heart className="fill-white text-white" size={24} />
           MingleKE
         </h1>
-        <button className="p-3 glass-panel rounded-full shadow-sm text-white hover:text-primary-light transition-colors">
+        <button className="p-3 glass-panel rounded-full  text-white hover:text-gray-400 transition-colors">
           <Filter size={20} />
         </button>
       </header>
@@ -211,21 +211,21 @@ export default function DiscoveryScreen() {
                 
                 {/* Overlays */}
                 <motion.div style={{ opacity: likeOpacity }} className="absolute top-12 left-10 border-4 border-teal-400 rounded-lg py-2 px-4 rotate-[-20deg] pointer-events-none z-30">
-                  <span className="text-teal-400 text-4xl font-black uppercase tracking-widest">Like</span>
+                  <span className="text-teal-400 text-4xl font-bold uppercase tracking-widest">Like</span>
                 </motion.div>
                 <motion.div style={{ opacity: nopeOpacity }} className="absolute top-12 right-10 border-4 border-red-500 rounded-lg py-2 px-4 rotate-[20deg] pointer-events-none z-30">
-                  <span className="text-red-500 text-4xl font-black uppercase tracking-widest">Nope</span>
+                  <span className="text-red-500 text-4xl font-bold uppercase tracking-widest">Nope</span>
                 </motion.div>
 
-                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 from-black/80 via-transparent to-transparent pointer-events-none" />
                 
                 <div className="absolute inset-x-0 bottom-0 p-6 text-white space-y-1 z-30">
                   <div className="flex items-end justify-between gap-2">
                     <div className="flex items-end gap-2">
-                      <h2 className="text-3xl font-black">{currentProfile.name}, {currentProfile.age}</h2>
-                      <div className="mb-2 bg-teal-400 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
+                      <h2 className="text-3xl font-bold">{currentProfile.name}, {currentProfile.age}</h2>
+                      <div className="mb-2 bg-teal-400 px-2 py-0.5 rounded-md flex items-center gap-1 ">
                          <Sparkles size={10} className="text-white fill-white" />
-                         <span className="text-[9px] font-black uppercase tracking-wider">VERIFIED</span>
+                         <span className="text-[9px] font-bold uppercase tracking-wider">VERIFIED</span>
                       </div>
                     </div>
                     <button 
@@ -247,8 +247,8 @@ export default function DiscoveryScreen() {
             </motion.div>
           ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-6">
-                <div className="w-32 h-32 glass-panel rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(191,97,255,0.2)]">
-                   <Compass size={64} className="text-primary-light animate-[spin_4s_linear_infinite]" />
+                <div className="w-32 h-32 glass-panel rounded-full flex items-center justify-center ">
+                   <Compass size={64} className="text-gray-400 animate-spin" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-3xl font-bold text-white">That's everyone!</h3>
@@ -269,17 +269,17 @@ export default function DiscoveryScreen() {
       <div className="h-40 flex items-center justify-center gap-6 pb-20">
         <button 
           onClick={() => { x.set(-300); setTimeout(() => handleSwipe('left'), 200); }}
-          className="w-16 h-16 glass-panel rounded-full flex items-center justify-center text-secondary-light active:scale-[0.85] transition-all duration-300 shadow-[0_0_20px_rgba(255,77,141,0.2)] hover:shadow-[0_0_30px_rgba(255,77,141,0.4)]"
+          className="w-16 h-16 glass-panel rounded-full flex items-center justify-center text-gray-400 active:scale-[0.85] transition-all duration-300  hover:"
         >
           <X size={28} strokeWidth={3} />
         </button>
         <button 
            onClick={() => { x.set(300); setTimeout(() => handleSwipe('right'), 200); }}
-           className="w-20 h-20 bg-linear-to-br from-primary-main to-secondary-main rounded-full flex items-center justify-center text-white active:scale-[0.85] transition-all duration-300 shadow-[0_0_30px_rgba(191,97,255,0.4)] hover:shadow-[0_0_50px_rgba(191,97,255,0.6)]"
+           className="w-20 h-20 rounded-full flex items-center justify-center text-white active:scale-[0.85] transition-all duration-300  hover:"
         >
           <Heart size={38} fill="currentColor" strokeWidth={0} />
         </button>
-        <button className="w-16 h-16 glass-panel rounded-full flex items-center justify-center text-accent-teal active:scale-[0.85] transition-all duration-300 shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)]">
+        <button className="w-16 h-16 glass-panel rounded-full flex items-center justify-center text-accent-teal active:scale-[0.85] transition-all duration-300  hover:">
           <Sparkles size={28} fill="currentColor" strokeWidth={0} />
         </button>
       </div>
@@ -294,8 +294,8 @@ export default function DiscoveryScreen() {
             className="fixed inset-0 z-50 bg-[#0F0110]/95 backdrop-blur-xl flex flex-col items-center justify-center p-8"
           >
             {/* Ambient Gradients */}
-            <div className="absolute top-0 -left-20 w-80 h-80 bg-primary-main/20 rounded-full blur-[100px]" />
-            <div className="absolute bottom-0 -right-20 w-80 h-80 bg-secondary-main/20 rounded-full blur-[100px]" />
+            <div className="absolute top-0 -left-20 w-80 h-80 bg-white/10 rounded-full blur-[100px]" />
+            <div className="absolute bottom-0 -right-20 w-80 h-80 bg-white/10 rounded-full blur-[100px]" />
             
             <motion.div 
               initial={{ scale: 0, rotate: -20, y: 50 }}
@@ -304,8 +304,8 @@ export default function DiscoveryScreen() {
               className="text-center space-y-10 relative z-10"
             >
               <div className="space-y-4">
-                <span className="text-primary-light font-black uppercase tracking-[0.3em] text-sm">Bravo!</span>
-                <h2 className="text-7xl font-black italic text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]">It's a Match!</h2>
+                <span className="text-gray-400 font-bold uppercase tracking-[0.3em] text-sm">Bravo!</span>
+                <h2 className="text-7xl font-bold italic text-white ">It's a Match!</h2>
               </div>
               
               <div className="flex items-center justify-center -space-x-8">
@@ -324,7 +324,7 @@ export default function DiscoveryScreen() {
               <div className="w-full space-y-4 pt-4">
                 <button 
                   onClick={() => setMatchFound(null)}
-                  className="w-full bg-white text-primary-main font-black py-4 rounded-full text-lg shadow-xl"
+                  className="w-full bg-white text-white font-bold py-4 rounded-full text-lg "
                 >
                   Send a Message
                 </button>
