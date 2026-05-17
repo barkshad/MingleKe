@@ -27,17 +27,19 @@ async function startServer() {
         });
       }
 
-      // Lipana.dev STK Push
-      // Using msisdn format: 254XXXXXXXXX
-      const formattedPhone = phoneNumber.replace('+', '').replace(/^0/, '254');
+      // Lipana.dev STK Push via Payment Links
+      // Format phone as +254...
+      const formattedPhone = '+' + phoneNumber.replace('+', '').replace(/^0/, '254');
+      const slug = process.env.LIPANA_PAYMENT_LINK_SLUG || 'mingleke';
       
-      const response = await axios.post("https://api.lipana.dev/v1/stk/push", {
-        api_key: lipanaApiKey,
-        msisdn: formattedPhone,
-        amount: amount,
-        account_reference: "MingleKE",
-        transaction_description: "Profile Verification Fee",
-        callback_url: process.env.LIPANA_CALLBACK_URL || `${process.env.APP_URL}/api/mpesa/callback`
+      const response = await axios.post(`https://api.lipana.dev/api/payment-links/public/${slug}/pay`, {
+        phone: formattedPhone,
+        amount: amount
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': lipanaApiKey
+        }
       });
 
       console.log("Lipana Response:", response.data);
