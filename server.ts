@@ -2,6 +2,8 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
+const pendingPayments = new Map<string, any>();
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -12,6 +14,10 @@ async function startServer() {
   // API Route: M-Pesa STK Push
   app.post("/api/mpesa/stkpush", async (req, res) => {
     const { phoneNumber, amount } = req.body;
+
+    // Track payment
+    const formattedPhone = '+' + phoneNumber.replace('+', '').replace(/^0/, '254');
+    pendingPayments.set(formattedPhone, { status: 'pending', timestamp: Date.now() });
 
     try {
       const lipanaApiKey = process.env.LIPANA_API_KEY;
@@ -28,9 +34,6 @@ async function startServer() {
       }
 
       // Lipana.dev STK Push via Payment Links
-      // Format phone as +254...
-      const formattedPhone = '+' + phoneNumber.replace('+', '').replace(/^0/, '254');
-      
       let slug = process.env.LIPANA_PAYMENT_LINK_SLUG || 'mingleke';
       // If the slug is provided as a full URL, extract just the slug
       if (slug.includes('/')) {
@@ -63,9 +66,51 @@ async function startServer() {
     }
   });
 
-  // M-Pesa Callback (Placeholder)
+  // Check Payment Status (Polling endpoint)
+  app.get("/api/mpesa/status", (req, res) => {
+    const { phone } = req.query;
+    if (!phone) return res.status(400).json({ error: 'Phone query parameter is required' });
+    
+    // Check with the same phone format
+    const formattedPhone = '+' + String(phone).replace('+', '').replace(/^0/, '254');
+    const payment = pendingPayments.get(formattedPhone);
+    
+    res.json({ 
+      status: payment?.status || 'not_found',
+      data: payment 
+    });
+  });
+
+  // M-Pesa Callback Webhook
   app.post("/api/mpesa/callback", (req, res) => {
-    console.log("M-Pesa Callback received:", req.body);
+    console.log("M-Pesa Callback received:", JSON.stringify(req.body, null, 2));
+    
+    try {
+      // Intentionally lenient to catch various Lipana and Safaricom formats
+      const bodyStr = JSON.stringify(req.body);
+      
+      // Iterate through pending payments and see if the webhook belongs to one of them
+      for (const [phone, payment] of pendingPayments.entries()) {
+        const cleanPhone = phone.replace('+', ''); // Without the plus
+        
+        // If the phone number is found anywhere in the payload string, we mark it success
+        // This is a naive but robust way to handle unknown payload shapes!
+        if (bodyStr.includes(cleanPhone)) {
+           console.log(`Matched callback to pending payment for ${phone}`);
+           
+           // Make sure it's a successful transaction (usually contains "Success", "Completed", or ResultCode: 0)
+           if (bodyStr.toLowerCase().includes('success') || bodyStr.includes('"ResultCode":0') || bodyStr.includes('"ResultCode": 0')) {
+             pendingPayments.set(phone, { status: 'success', data: req.body, timestamp: Date.now() });
+           } else {
+             pendingPayments.set(phone, { status: 'failed', data: req.body, timestamp: Date.now() });
+           }
+           break;
+        }
+      }
+    } catch (e) {
+      console.error("Error processing callback", e);
+    }
+
     res.json({ ResultCode: 0, ResultDesc: "Accepted" });
   });
 

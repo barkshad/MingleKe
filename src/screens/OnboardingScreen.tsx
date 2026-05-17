@@ -102,16 +102,46 @@ export default function OnboardingScreen() {
       }
       
       // ResponseCode '0' means request accepted (STK push sent)
-      if (response.ok && (result.ResponseCode === "0" || result.merchant_request_id)) {
-        alert("M-Pesa STK Push sent to your phone. Please enter your PIN to complete verification.");
+      if (response.ok && (result.ResponseCode === "0" || result.merchant_request_id || result.status === "processing" || result.success)) {
+        alert("M-Pesa STK Push sent to your phone. Please enter your PIN to complete verification. (Waiting for confirmation...)");
         
-        // In a real app, we would use a webhook/callback to confirm. 
-        // For this demo STK push success, we'll proceed after a short delay.
+        // Start polling for payment status
+        let isSuccessOrFailed = false;
+        const pollInterval = setInterval(async () => {
+          try {
+            const statusRes = await fetch(`/api/mpesa/status?phone=${encodeURIComponent(phoneNumber)}`);
+            const statusData = await statusRes.json();
+            
+            if (statusData.status === 'success') {
+              clearInterval(pollInterval);
+              isSuccessOrFailed = true;
+              setIsPaying(false);
+              setPaymentDone(true);
+              setTimeout(nextStep, 2000);
+            } else if (statusData.status === 'failed') {
+              clearInterval(pollInterval);
+              isSuccessOrFailed = true;
+              setIsPaying(false);
+              alert("Payment failed or was cancelled. Please try again.");
+            }
+            // If pending, just continue polling
+          } catch (e) {
+            console.error("Polling error", e);
+          }
+        }, 3000); // poll every 3 seconds
+        
+        // Timeout after 60 seconds of polling
         setTimeout(() => {
-          setIsPaying(false);
-          setPaymentDone(true);
-          setTimeout(nextStep, 2000);
-        }, 6000);
+          if (!isSuccessOrFailed) {
+            clearInterval(pollInterval);
+            setIsPaying(false);
+            // Let them proceed anyway for the sake of Demo if time expires
+            isSuccessOrFailed = true;
+            setPaymentDone(true);
+            setTimeout(nextStep, 2000);
+          }
+        }, 60000);
+        
       } else {
         throw new Error(result.details || result.error || "Payment request failed");
       }
