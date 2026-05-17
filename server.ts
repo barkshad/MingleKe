@@ -12,6 +12,17 @@ async function startServer() {
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // API Route: M-Pesa STK Push
+  app.post("/api/mpesa/track", async (req, res) => {
+    const { phoneNumber } = req.body;
+    if (!phoneNumber) return res.status(400).json({ error: 'phoneNumber is required' });
+    
+    // Track payment
+    const formattedPhone = '+' + phoneNumber.replace('+', '').replace(/^0/, '254');
+    pendingPayments.set(formattedPhone, { status: 'pending', timestamp: Date.now() });
+    
+    res.json({ success: true, tracking: formattedPhone });
+  });
+
   app.post("/api/mpesa/stkpush", async (req, res) => {
     const { phoneNumber, amount } = req.body;
 

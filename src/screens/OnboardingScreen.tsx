@@ -84,67 +84,54 @@ export default function OnboardingScreen() {
         return;
       }
 
-      const response = await fetch('/api/mpesa/stkpush', {
+      const response = await fetch('/api/mpesa/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          phoneNumber, 
-          amount: 100
-        }),
+        body: JSON.stringify({ phoneNumber }),
       });
 
-      let result;
-      const responseText = await response.text();
-      try {
-        result = JSON.parse(responseText);
-      } catch (e) {
-        throw new Error("Server returned an invalid response (HTML). Please check your backend configuration.");
-      }
+      // Open the payment link in a new window / in-app browser
+      window.open('https://lipana.dev/pay/mingleke', '_blank');
       
-      // ResponseCode '0' means request accepted (STK push sent)
-      if (response.ok && (result.ResponseCode === "0" || result.merchant_request_id || result.status === "processing" || result.success)) {
-        alert("M-Pesa STK Push sent to your phone. Please enter your PIN to complete verification. (Waiting for confirmation...)");
-        
-        // Start polling for payment status
-        let isSuccessOrFailed = false;
-        const pollInterval = setInterval(async () => {
-          try {
-            const statusRes = await fetch(`/api/mpesa/status?phone=${encodeURIComponent(phoneNumber)}`);
-            const statusData = await statusRes.json();
-            
-            if (statusData.status === 'success') {
-              clearInterval(pollInterval);
-              isSuccessOrFailed = true;
-              setIsPaying(false);
-              setPaymentDone(true);
-              setTimeout(nextStep, 2000);
-            } else if (statusData.status === 'failed') {
-              clearInterval(pollInterval);
-              isSuccessOrFailed = true;
-              setIsPaying(false);
-              alert("Payment failed or was cancelled. Please try again.");
-            }
-            // If pending, just continue polling
-          } catch (e) {
-            console.error("Polling error", e);
-          }
-        }, 3000); // poll every 3 seconds
-        
-        // Timeout after 60 seconds of polling
-        setTimeout(() => {
-          if (!isSuccessOrFailed) {
+      alert("Please complete the payment in the opened browser window. We are waiting for confirmation...");
+      
+      // Start polling for payment status
+      let isSuccessOrFailed = false;
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/api/mpesa/status?phone=${encodeURIComponent(phoneNumber)}`);
+          const statusData = await statusRes.json();
+          
+          if (statusData.status === 'success') {
             clearInterval(pollInterval);
-            setIsPaying(false);
-            // Let them proceed anyway for the sake of Demo if time expires
             isSuccessOrFailed = true;
+            setIsPaying(false);
             setPaymentDone(true);
             setTimeout(nextStep, 2000);
+          } else if (statusData.status === 'failed') {
+            clearInterval(pollInterval);
+            isSuccessOrFailed = true;
+            setIsPaying(false);
+            alert("Payment failed or was cancelled. Please try again.");
           }
-        }, 60000);
-        
-      } else {
-        throw new Error(result.details || result.error || "Payment request failed");
-      }
+          // If pending, just continue polling
+        } catch (e) {
+          console.error("Polling error", e);
+        }
+      }, 3000); // poll every 3 seconds
+      
+      // Timeout after 60 seconds of polling
+      setTimeout(() => {
+        if (!isSuccessOrFailed) {
+          clearInterval(pollInterval);
+          setIsPaying(false);
+          // Let them proceed anyway for the sake of Demo if time expires
+          isSuccessOrFailed = true;
+          setPaymentDone(true);
+          setTimeout(nextStep, 2000);
+        }
+      }, 60000);
+      
     } catch (err: any) {
       console.error("Payment Error:", err);
       alert(err.message || "M-Pesa service is currently unavailable. Try again later.");
@@ -461,8 +448,8 @@ export default function OnboardingScreen() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white font-bold text-xl ">M</div>
                         <div>
-                          <p className="font-bold text-white text-lg">M-Pesa STK</p>
-                          <p className="text-sm text-white/50 font-medium">Push to {user?.phoneNumber || 'registered number'}</p>
+                          <p className="font-bold text-white text-lg">Lipana Link</p>
+                          <p className="text-sm text-white/50 font-medium">Opens in a new browser window</p>
                         </div>
                       </div>
                       <div className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
@@ -473,10 +460,10 @@ export default function OnboardingScreen() {
                     {isPaying ? (
                       <div className="flex flex-col items-center py-4">
                         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white mb-4"></div>
-                        <p className="text-sm font-medium animate-pulse">Waiting for M-Pesa approval...</p>
+                        <p className="text-sm font-medium animate-pulse text-white">Waiting for payment confirmation...</p>
                       </div>
                     ) : paymentDone ? (
-                      <div className="flex flex-col items-center py-4 text-green-600">
+                      <div className="flex flex-col items-center py-4 text-green-500">
                         <CheckCircle size={48} className="mb-2" />
                         <p className="font-bold">Payment Successful!</p>
                       </div>
@@ -486,7 +473,7 @@ export default function OnboardingScreen() {
                         className="w-full btn-primary flex items-center justify-center gap-3"
                       >
                         <CreditCard size={20} />
-                        Pay KES 100 via M-Pesa
+                        Pay KES 100 via Lipana
                       </button>
                     )}
                   </div>
