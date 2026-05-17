@@ -1,65 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { MessageCircle, Heart, Search, ChevronRight } from 'lucide-react';
-import { collection, query, where, onSnapshot, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
-
-interface MatchItem {
-  id: string;
-  otherUser: {
-    uid: string;
-    name: string;
-    photos: string[];
-  };
-  lastMessage?: string;
-  lastMessageAt?: any;
-}
+import { useMatchStore } from '../store';
 
 export default function MatchesScreen() {
-  const [matches, setMatches] = useState<MatchItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { matches, loading, subscribeToMatches } = useMatchStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) return;
-
-    const q = query(
-      collection(db, 'matches'),
-      where('users', 'array-contains', user.uid)
-    );
-
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const matchPromises = snapshot.docs.map(async (matchDoc) => {
-        const data = matchDoc.data();
-        const otherUserId = data.users.find((id: string) => id !== user.uid);
-        
-        // Fetch other user profile
-        const userDoc = await getDoc(doc(db, 'users', otherUserId));
-        const userData = userDoc.data();
-
-        return {
-          id: matchDoc.id,
-          otherUser: {
-            uid: otherUserId,
-            name: userData?.name || 'User',
-            photos: userData?.photos || [],
-          },
-          lastMessage: data.lastMessage,
-          lastMessageAt: data.lastMessageAt,
-        };
-      });
-
-      const results = await Promise.all(matchPromises);
-      setMatches(results.sort((a, b) => (b.lastMessageAt?.seconds || 0) - (a.lastMessageAt?.seconds || 0)));
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
+    if (user) {
+      const unsubscribe = subscribeToMatches(user.uid);
+      return () => unsubscribe();
+    }
+  }, [user, subscribeToMatches]);
 
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">

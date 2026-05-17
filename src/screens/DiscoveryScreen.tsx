@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'motion/react';
-import { Heart, X, Info, MapPin, Sparkles, Filter } from 'lucide-react';
+import { Heart, X, Info, MapPin, Sparkles, Filter, Compass } from 'lucide-react';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import Navigation from '../components/Navigation';
+import { cn } from '../lib/utils';
 
 interface Profile {
   uid: string;
@@ -20,6 +21,7 @@ export default function DiscoveryScreen() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [matchFound, setMatchFound] = useState<Profile | null>(null);
   const { user, profile: currentUserProfile } = useAuth();
 
@@ -32,6 +34,19 @@ export default function DiscoveryScreen() {
   useEffect(() => {
     fetchProfiles();
   }, [currentUserProfile]);
+
+  useEffect(() => {
+    // Reset photo index when card changes
+    setActivePhotoIndex(0);
+  }, [currentIndex]);
+
+  const handlePhotoClick = (direction: 'next' | 'prev', photosCount: number) => {
+    if (direction === 'next') {
+      setActivePhotoIndex(prev => (prev + 1) % photosCount);
+    } else {
+      setActivePhotoIndex(prev => (prev - 1 + photosCount) % photosCount);
+    }
+  };
 
   const fetchProfiles = async () => {
     if (!user || !currentUserProfile) return;
@@ -62,6 +77,26 @@ export default function DiscoveryScreen() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReport = async (profileId: string) => {
+    if (!user) return;
+    const reason = window.prompt("Why are you reporting this user? (Spam, Inappropriate, Harassment)");
+    if (!reason) return;
+
+    try {
+      await addDoc(collection(db, 'reports'), {
+        reporterId: user.uid,
+        reportedId: profileId,
+        reason,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      });
+      alert("Report submitted. Thank you for keeping our community safe.");
+      setCurrentIndex(prev => prev + 1); // Skip the reported user
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -144,41 +179,70 @@ export default function DiscoveryScreen() {
             >
               <div className="w-full h-full card-container relative group">
                 <img 
-                  src={currentProfile.photos[0] || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=800&auto=format&fit=crop&q=60'} 
+                  src={currentProfile.photos[activePhotoIndex] || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=800&auto=format&fit=crop&q=60'} 
                   className="w-full h-full object-cover select-none pointer-events-none"
                   alt={currentProfile.name} 
                 />
+
+                {/* Photo Pager Areas */}
+                <div className="absolute inset-0 flex">
+                  <div 
+                    className="w-1/2 h-[70%] z-10" 
+                    onClick={(e) => { e.stopPropagation(); handlePhotoClick('prev', currentProfile.photos.length); }}
+                  />
+                  <div 
+                    className="w-1/2 h-[70%] z-10" 
+                    onClick={(e) => { e.stopPropagation(); handlePhotoClick('next', currentProfile.photos.length); }}
+                  />
+                </div>
+
+                {/* Photo Indicators */}
+                <div className="absolute top-4 left-4 right-4 flex gap-1 z-20">
+                  {currentProfile.photos.map((_, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "h-1 flex-1 rounded-full transition-all duration-300",
+                        idx === activePhotoIndex ? "bg-white" : "bg-white/30"
+                      )} 
+                    />
+                  ))}
+                </div>
                 
                 {/* Overlays */}
-                <motion.div style={{ opacity: likeOpacity }} className="absolute top-10 left-10 border-4 border-teal-400 rounded-lg py-2 px-4 rotate-[-20deg] pointer-events-none">
+                <motion.div style={{ opacity: likeOpacity }} className="absolute top-12 left-10 border-4 border-teal-400 rounded-lg py-2 px-4 rotate-[-20deg] pointer-events-none z-30">
                   <span className="text-teal-400 text-4xl font-black uppercase tracking-widest">Like</span>
                 </motion.div>
-                <motion.div style={{ opacity: nopeOpacity }} className="absolute top-10 right-10 border-4 border-red-500 rounded-lg py-2 px-4 rotate-[20deg] pointer-events-none">
+                <motion.div style={{ opacity: nopeOpacity }} className="absolute top-12 right-10 border-4 border-red-500 rounded-lg py-2 px-4 rotate-[20deg] pointer-events-none z-30">
                   <span className="text-red-500 text-4xl font-black uppercase tracking-widest">Nope</span>
                 </motion.div>
 
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                 
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white space-y-1">
-                  <div className="flex items-end gap-2">
-                    <h2 className="text-3xl font-black">{currentProfile.name}, {currentProfile.age}</h2>
-                    <div className="mb-2 bg-primary-main/20 backdrop-blur-xs px-2 py-0.5 rounded-md flex items-center gap-1">
-                       <Sparkles size={12} className="text-white fill-white" />
-                       <span className="text-[10px] font-bold uppercase tracking-wide">Popular</span>
+                <div className="absolute inset-x-0 bottom-0 p-6 text-white space-y-1 z-30">
+                  <div className="flex items-end justify-between gap-2">
+                    <div className="flex items-end gap-2">
+                      <h2 className="text-3xl font-black">{currentProfile.name}, {currentProfile.age}</h2>
+                      <div className="mb-2 bg-teal-400 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
+                         <Sparkles size={10} className="text-white fill-white" />
+                         <span className="text-[9px] font-black uppercase tracking-wider">VERIFIED</span>
+                      </div>
                     </div>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleReport(currentProfile.uid); }}
+                      className="mb-2 p-2 bg-black/20 backdrop-blur-md rounded-full text-white/60 hover:text-red-400 transition-colors"
+                    >
+                      <Info size={18} />
+                    </button>
                   </div>
-                  <div className="flex items-center gap-1.5 text-white/80 text-sm">
+                  <div className="flex items-center gap-1.5 text-white/80 text-sm font-medium">
                     <MapPin size={14} />
                     <span>{currentProfile.location?.city || 'Nairobi'} • 5km away</span>
                   </div>
-                  <p className="text-white/90 text-sm line-clamp-2 pt-2 leading-relaxed">
+                  <p className="text-white/90 text-sm line-clamp-2 pt-2 leading-relaxed font-medium">
                     {currentProfile.bio}
                   </p>
                 </div>
-                
-                <button className="absolute bottom-24 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white border border-white/30">
-                  <Info size={20} />
-                </button>
               </div>
             </motion.div>
           ) : (
@@ -227,14 +291,22 @@ export default function DiscoveryScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 gradient-primary flex flex-col items-center justify-center p-8"
+            className="fixed inset-0 z-50 bg-[#0F0110]/95 backdrop-blur-xl flex flex-col items-center justify-center p-8"
           >
+            {/* Ambient Gradients */}
+            <div className="absolute top-0 -left-20 w-80 h-80 bg-primary-main/20 rounded-full blur-[100px]" />
+            <div className="absolute bottom-0 -right-20 w-80 h-80 bg-secondary-main/20 rounded-full blur-[100px]" />
+            
             <motion.div 
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              className="text-center space-y-8"
+              initial={{ scale: 0, rotate: -20, y: 50 }}
+              animate={{ scale: 1, rotate: 0, y: 0 }}
+              transition={{ type: "spring", damping: 15 }}
+              className="text-center space-y-10 relative z-10"
             >
-              <h2 className="text-6xl font-black italic text-white drop-shadow-xl">It's a Match!</h2>
+              <div className="space-y-4">
+                <span className="text-primary-light font-black uppercase tracking-[0.3em] text-sm">Bravo!</span>
+                <h2 className="text-7xl font-black italic text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]">It's a Match!</h2>
+              </div>
               
               <div className="flex items-center justify-center -space-x-8">
                 <div className="w-40 h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden rotate-[-12deg]">

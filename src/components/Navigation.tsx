@@ -22,8 +22,12 @@ export default function Navigation() {
             isActive ? "text-primary-main scale-110" : "text-slate-400"
           )}
         >
-          <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>
+          {({ isActive }) => (
+            <>
+              <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+              <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

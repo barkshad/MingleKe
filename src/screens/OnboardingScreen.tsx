@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Camera, MapPin, Calendar, User, Heart, ArrowRight, CheckCircle, CreditCard } from 'lucide-react';
+import { Camera, MapPin, Calendar, User, Heart, ArrowRight, CheckCircle, CreditCard, X } from 'lucide-react';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useAuth } from '../context/AuthContext';
@@ -66,13 +66,53 @@ export default function OnboardingScreen() {
     }
   };
 
-  const simulatePayment = () => {
+  const handleMpesaPayment = async () => {
+    if (!user) return;
     setIsPaying(true);
-    setTimeout(() => {
+    
+    try {
+      // Get phone number from auth or prompt if missing
+      let phoneNumber = user.phoneNumber;
+      if (!phoneNumber) {
+        phoneNumber = window.prompt("Enter your M-Pesa phone number (e.g. 0712345678):");
+      }
+
+      if (!phoneNumber || phoneNumber.length < 10) {
+        alert("A valid phone number is required for payment.");
+        setIsPaying(false);
+        return;
+      }
+
+      const response = await fetch('/api/mpesa/stkpush', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          phoneNumber, 
+          amount: 100
+        }),
+      });
+
+      const result = await response.json();
+      
+      // ResponseCode '0' means request accepted (STK push sent)
+      if (response.ok && (result.ResponseCode === "0" || result.merchant_request_id)) {
+        alert("M-Pesa STK Push sent to your phone. Please enter your PIN to complete verification.");
+        
+        // In a real app, we would use a webhook/callback to confirm. 
+        // For this demo STK push success, we'll proceed after a short delay.
+        setTimeout(() => {
+          setIsPaying(false);
+          setPaymentDone(true);
+          setTimeout(nextStep, 2000);
+        }, 6000);
+      } else {
+        throw new Error(result.details || result.error || "Payment request failed");
+      }
+    } catch (err: any) {
+      console.error("Payment Error:", err);
+      alert(err.message || "M-Pesa service is currently unavailable. Try again later.");
       setIsPaying(false);
-      setPaymentDone(true);
-      setTimeout(nextStep, 1500);
-    }, 2000);
+    }
   };
 
   return (
@@ -236,31 +276,48 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">Add a photo</h1>
-              <div className="grid grid-cols-2 gap-4">
-                {[0, 1].map((idx) => (
-                  <div key={idx} className="aspect-[3/4] rounded-2xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative">
+              <div className="flex justify-between items-end">
+                <h1 className="text-3xl font-bold text-gray-900">Add 3 photos</h1>
+                <span className="text-sm font-bold text-primary-main">{data.photos.filter(p => !!p).length}/3</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[0, 1, 2].map((idx) => (
+                  <div key={idx} className="aspect-[3/4] rounded-xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative">
                     {data.photos[idx] ? (
-                      <img src={data.photos[idx]} alt="Profile" className="w-full h-full object-cover" />
+                      <>
+                        <img src={data.photos[idx]} alt="Profile" className="w-full h-full object-cover" />
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newPhotos = [...data.photos];
+                            newPhotos[idx] = '';
+                            setData({ ...data, photos: newPhotos });
+                          }}
+                          className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1"
+                        >
+                          <X size={12} />
+                        </button>
+                      </>
                     ) : (
                       <button 
                         onClick={() => {
-                          const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name || 'mingle'}${idx}`;
+                          const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name || 'mingle'}${idx}${Date.now()}`;
                           const newPhotos = [...data.photos];
                           newPhotos[idx] = url;
                           setData({ ...data, photos: newPhotos });
                         }}
-                        className="text-primary-main flex flex-col items-center"
+                        className="text-primary-main flex flex-col items-center p-2 text-center"
                       >
-                        <Camera size={32} />
-                        <span className="text-xs mt-2 font-medium">Add Photo</span>
+                        <Camera size={24} />
+                        <span className="text-[10px] mt-1 font-bold">Upload</span>
                       </button>
                     )}
                   </div>
                 ))}
               </div>
+              <p className="text-xs text-slate-400 text-center font-medium">Add clear photos to get more matches!</p>
               <button
-                disabled={data.photos.length === 0}
+                disabled={data.photos.filter(p => !!p).length < 3}
                 onClick={nextStep}
                 className="w-full btn-primary disabled:opacity-50"
               >
@@ -336,7 +393,7 @@ export default function OnboardingScreen() {
                       </div>
                     ) : (
                       <button 
-                        onClick={simulatePayment}
+                        onClick={handleMpesaPayment}
                         className="w-full btn-primary flex items-center justify-center gap-3"
                       >
                         <CreditCard size={20} />
