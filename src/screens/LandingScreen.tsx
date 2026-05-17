@@ -33,7 +33,11 @@ export default function LandingScreen() {
       await signInWithPopup(auth, provider);
       navigate('/onboarding');
     } catch (err: any) {
-      setError(err.message);
+      if (err.code === 'auth/unauthorized-domain') {
+        setError('This domain is not authorized for Google Sign-In. Please add your Vercel domain to the "Authorized domains" list in Firebase Console (Authentication > Settings > Authorized domains).');
+      } else {
+        setError(err.message);
+      }
     }
   };
 
@@ -95,6 +99,12 @@ export default function LandingScreen() {
                 <span className="text-xs uppercase tracking-widest font-bold">or continue with</span>
                 <div className="h-[1px] flex-1 bg-white/30" />
               </div>
+
+              {error && (
+                <p className="text-white text-xs bg-red-500/30 p-3 rounded-lg border border-red-500/50">
+                  {error}
+                </p>
+              )}
 
               <button
                 onClick={handleGoogleLogin}
