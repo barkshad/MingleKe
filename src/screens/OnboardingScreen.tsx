@@ -116,12 +116,12 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
-      <div className="h-2 w-full bg-gray-100 flex">
+    <div className="flex-1 flex flex-col relative z-20 w-full text-white">
+      <div className="h-1.5 w-full bg-white/10 flex">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${(step / 9) * 100}%` }}
-          className="h-full gradient-primary"
+          className="h-full bg-linear-to-r from-primary-main to-secondary-main shadow-[0_0_10px_rgba(191,97,255,0.8)]"
         />
       </div>
 
@@ -135,18 +135,18 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">What's your gender?</h1>
+              <h1 className="text-4xl font-black text-white drop-shadow-md">What's your gender?</h1>
               <div className="grid grid-cols-1 gap-4">
                 {['male', 'female', 'other'].map((g) => (
                   <button
                     key={g}
                     onClick={() => { setData({ ...data, gender: g as any }); nextStep(); }}
                     className={cn(
-                      "w-full p-6 rounded-2xl border-2 text-left transition-all flex items-center justify-between",
-                      data.gender === g ? "border-primary-main bg-primary-main/5 text-primary-main" : "border-gray-200"
+                      "w-full p-6 rounded-[24px] border-2 text-left transition-all duration-300 flex items-center justify-between glass-panel",
+                      data.gender === g ? "border-primary-main bg-white/10 text-primary-light shadow-[0_0_20px_rgba(191,97,255,0.3)]" : "border-white/10 hover:bg-white/5"
                     )}
                   >
-                    <span className="capitalize font-semibold text-lg">{g}</span>
+                    <span className="capitalize font-bold text-xl">{g}</span>
                     {data.gender === g && <CheckCircle size={20} />}
                   </button>
                 ))}
@@ -162,18 +162,18 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">Who are you interested in?</h1>
+              <h1 className="text-4xl font-black text-white drop-shadow-md">Who are you interested in?</h1>
               <div className="grid grid-cols-1 gap-4">
                 {['men', 'women', 'everyone'].map((pref) => (
                   <button
                     key={pref}
                     onClick={() => { setData({ ...data, interestedIn: pref as any }); nextStep(); }}
                     className={cn(
-                      "w-full p-6 rounded-2xl border-2 text-left transition-all flex items-center justify-between",
-                      data.interestedIn === pref ? "border-primary-main bg-primary-main/5 text-primary-main" : "border-gray-200"
+                      "w-full p-6 rounded-[24px] border-2 text-left transition-all duration-300 flex items-center justify-between glass-panel",
+                      data.interestedIn === pref ? "border-primary-main bg-white/10 text-primary-light shadow-[0_0_20px_rgba(191,97,255,0.3)]" : "border-white/10 hover:bg-white/5"
                     )}
                   >
-                    <span className="capitalize font-semibold text-lg">{pref}</span>
+                    <span className="capitalize font-bold text-xl">{pref}</span>
                     {data.interestedIn === pref && <CheckCircle size={20} />}
                   </button>
                 ))}
@@ -188,18 +188,18 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">When is your birthday?</h1>
+              <h1 className="text-4xl font-black text-white drop-shadow-md">When is your birthday?</h1>
               <div className="space-y-4">
-                <div className="flex bg-gray-100 p-4 rounded-2xl items-center gap-3">
-                  <Calendar className="text-gray-400" />
+                <div className="flex glass-panel border border-white/20 p-5 rounded-[24px] items-center gap-4">
+                  <Calendar className="text-primary-light" size={28} />
                   <input
                     type="date"
                     value={data.birthday}
                     onChange={(e) => setData({ ...data, birthday: e.target.value })}
-                    className="bg-transparent flex-1 focus:outline-hidden font-medium"
+                    className="bg-transparent flex-1 focus:outline-hidden font-bold text-xl text-white color-scheme-dark"
                   />
                 </div>
-                <p className="text-sm text-gray-500">Your profile shows your age, not your birthday.</p>
+                <p className="text-sm text-white/50 px-2">Your profile shows your age, not your birthday.</p>
                 <button
                   disabled={!data.birthday || calculateAge(data.birthday) < 18}
                   onClick={nextStep}
@@ -219,14 +219,14 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">What's your name?</h1>
+              <h1 className="text-4xl font-black text-white drop-shadow-md">What's your name?</h1>
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Your First Name"
                   value={data.name}
                   onChange={(e) => setData({ ...data, name: e.target.value })}
-                  className="w-full p-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-primary-main font-semibold text-lg"
+                  className="w-full p-5 glass-panel rounded-[24px] border border-white/20 focus:border-primary-main focus:ring-2 focus:ring-primary-main/30 font-bold text-xl text-white placeholder:text-white/30 transition-all outline-hidden"
                 />
                 <button
                   disabled={!data.name}
@@ -246,21 +246,21 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">Where are you located?</h1>
+              <h1 className="text-4xl font-black text-white drop-shadow-md">Where are you located?</h1>
               <div className="space-y-4">
                 <button
                   onClick={() => { setData({ ...data, location: { city: 'Nairobi', lat: -1.286389, lng: 36.817223 } }); nextStep(); }}
-                  className="w-full p-5 rounded-2xl border-2 border-primary-main bg-primary-main/5 text-primary-main flex items-center justify-center gap-3 font-semibold"
+                  className="w-full p-6 rounded-[24px] border border-primary-light bg-primary-main/20 text-white flex items-center justify-center gap-3 font-bold text-lg shadow-[0_0_30px_rgba(191,97,255,0.2)] hover:bg-primary-main/30 transition-all"
                 >
-                  <MapPin size={24} />
+                  <MapPin size={24} className="text-primary-light" />
                   Detect My Location
                 </button>
-                <div className="text-center text-sm text-gray-400">or</div>
+                <div className="text-center text-sm font-bold text-white/30 uppercase tracking-widest py-2">or</div>
                 {['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru'].map(city => (
                   <button
                     key={city}
                     onClick={() => { setData({ ...data, location: { city, lat: 0, lng: 0 } }); nextStep(); }}
-                    className="w-full p-4 rounded-xl border border-gray-200 text-left hover:border-primary-main transition-colors font-medium text-gray-700"
+                    className="w-full p-5 rounded-[20px] border border-white/10 glass-panel text-left hover:border-primary-main transition-colors font-bold text-lg text-white/80 hover:text-white"
                   >
                     {city}
                   </button>
@@ -277,15 +277,15 @@ export default function OnboardingScreen() {
               className="space-y-6"
             >
               <div className="flex justify-between items-end">
-                <h1 className="text-3xl font-bold text-gray-900">Add 3 photos</h1>
-                <span className="text-sm font-bold text-primary-main">{data.photos.filter(p => !!p).length}/3</span>
+                <h1 className="text-4xl font-black text-white drop-shadow-md">Add 3 photos</h1>
+                <span className="text-lg font-bold text-primary-light">{data.photos.filter(p => !!p).length}/3</span>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-3">
                 {[0, 1, 2].map((idx) => (
-                  <div key={idx} className="aspect-[3/4] rounded-xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative">
+                  <div key={idx} className="aspect-[3/4] rounded-2xl glass-panel border border-white/20 hover:border-white/40 transition-colors flex items-center justify-center overflow-hidden relative group p-1">
                     {data.photos[idx] ? (
                       <>
-                        <img src={data.photos[idx]} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={data.photos[idx]} alt="Profile" className="w-full h-full object-cover rounded-xl" />
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -293,7 +293,7 @@ export default function OnboardingScreen() {
                             newPhotos[idx] = '';
                             setData({ ...data, photos: newPhotos });
                           }}
-                          className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1"
+                          className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white rounded-full p-1.5 shadow-lg active:scale-90"
                         >
                           <X size={12} />
                         </button>
@@ -333,12 +333,12 @@ export default function OnboardingScreen() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              <h1 className="text-3xl font-bold text-gray-900">About you</h1>
+              <h1 className="text-4xl font-black text-white drop-shadow-md">About you</h1>
               <textarea
                 placeholder="Write a short bio..."
                 value={data.bio}
                 onChange={(e) => setData({ ...data, bio: e.target.value })}
-                className="w-full h-40 p-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-primary-main resize-none font-medium text-gray-700"
+                className="w-full h-48 p-5 glass-panel rounded-[24px] border border-white/20 focus:border-primary-main focus:ring-2 focus:ring-primary-main/30 resize-none font-medium text-lg text-white placeholder:text-white/30 transition-all outline-hidden"
               />
               <button
                 onClick={nextStep}
@@ -358,27 +358,32 @@ export default function OnboardingScreen() {
             >
               {data.gender === 'female' ? (
                 <>
-                  <div className="bg-primary-main/10 p-6 rounded-3xl text-center space-y-3">
-                    <div className="w-16 h-16 bg-primary-main rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                      <CheckCircle className="text-white" size={32} />
+                  <div className="glass-panel p-8 rounded-[32px] text-center space-y-4 border border-primary-main/30 bg-primary-main/10 shadow-[0_0_50px_rgba(191,97,255,0.15)] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-main/20 rounded-full blur-[40px] -z-10" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-main/20 rounded-full blur-[40px] -z-10" />
+                    
+                    <div className="w-20 h-20 bg-linear-to-br from-primary-main to-secondary-main rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(255,77,141,0.4)]">
+                      <CheckCircle className="text-white" size={40} />
                     </div>
-                    <h2 className="text-2xl font-bold text-primary-dark">Verify Your Access</h2>
-                    <p className="text-gray-600 text-sm">
-                      MingleKE aims for a safe & high-quality community. One-time verification fee:
+                    <h2 className="text-3xl font-black text-white drop-shadow-md">Verify Your Access</h2>
+                    <p className="text-white/70 text-base font-medium">
+                      MingleKE ensures a high-quality community. One-time verification fee:
                     </p>
-                    <div className="text-4xl font-black text-gray-900 py-2">KES 100</div>
+                    <div className="text-5xl font-black gradient-text py-2 drop-shadow-lg">KES 100</div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold">M</div>
+                  <div className="space-y-4 pt-4">
+                    <div className="glass-panel border border-white/10 p-5 rounded-[24px] flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(34,197,94,0.4)]">M</div>
                         <div>
-                          <p className="font-bold text-gray-800">M-Pesa</p>
-                          <p className="text-xs text-gray-500">STK Push to {user?.phoneNumber || 'registered number'}</p>
+                          <p className="font-bold text-white text-lg">M-Pesa STK</p>
+                          <p className="text-sm text-white/50 font-medium">Push to {user?.phoneNumber || 'registered number'}</p>
                         </div>
                       </div>
-                      <input type="radio" checked readOnly className="accent-primary-main h-5 w-5" />
+                      <div className="w-6 h-6 rounded-full border-2 border-primary-main flex items-center justify-center">
+                        <div className="w-3 h-3 bg-primary-main rounded-full" />
+                      </div>
                     </div>
 
                     {isPaying ? (
@@ -404,12 +409,12 @@ export default function OnboardingScreen() {
                 </>
               ) : (
                 <div className="space-y-6 text-center py-12">
-                   <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle size={48} />
+                   <div className="w-24 h-24 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(34,197,94,0.3)]">
+                    <CheckCircle size={56} />
                   </div>
-                  <h1 className="text-3xl font-bold text-gray-900">All set!</h1>
-                  <p className="text-gray-500">You're ready to find your perfect match on MingleKE.</p>
-                  <button onClick={nextStep} className="w-full btn-primary">Continue</button>
+                  <h1 className="text-4xl font-black text-white drop-shadow-md">All set!</h1>
+                  <p className="text-white/60 text-lg">You're ready to find your perfect match on MingleKE.</p>
+                  <button onClick={nextStep} className="w-full btn-primary mt-8">Continue</button>
                 </div>
               )}
             </motion.div>
@@ -441,9 +446,9 @@ export default function OnboardingScreen() {
                    </motion.div>
                 ))}
               </div>
-              <h1 className="text-4xl font-black text-gray-900">Welcome to MingleKE</h1>
-              <p className="text-gray-500 text-lg">Your journey to meaningful social discovery starts now.</p>
-              <button onClick={handleComplete} className="w-full btn-primary h-16 text-lg">Start Mingling</button>
+              <h1 className="text-5xl font-black text-white drop-shadow-lg">Welcome to<br/>MingleKE</h1>
+              <p className="text-white/70 text-xl max-w-[260px]">Your journey to meaningful social discovery starts now.</p>
+              <button onClick={handleComplete} className="w-full btn-primary h-16 text-xl mt-6">Start Mingling</button>
             </motion.div>
           )}
         </AnimatePresence>

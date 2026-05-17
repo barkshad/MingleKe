@@ -96,32 +96,32 @@ export default function ChatScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col relative z-20 w-full text-white bg-black/40">
       {/* Header */}
-      <header className="h-20 border-b border-gray-100 flex items-center px-4 gap-3 bg-white sticky top-0 z-10">
-        <button onClick={() => navigate('/matches')} className="p-2 -ml-2 text-gray-500">
-          <ChevronLeft size={28} />
+      <header className="h-24 pb-4 border-b border-white/10 flex items-end px-4 gap-3 glass-panel sticky top-0 z-20">
+        <button onClick={() => navigate('/matches')} className="p-2 -ml-2 text-white/70 hover:text-white transition-colors">
+          <ChevronLeft size={32} />
         </button>
         <div className="flex-1 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden">
+          <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.1)]">
             {otherUser && <img src={otherUser.photos[0]} alt={otherUser.name} className="w-full h-full object-cover" />}
           </div>
           <div>
-            <h2 className="font-bold text-gray-900 leading-tight">{otherUser?.name || '...'}</h2>
-            <p className="text-[10px] text-green-500 font-bold uppercase tracking-wider">Online</p>
+            <h2 className="font-bold text-white text-xl leading-tight">{otherUser?.name || '...'}</h2>
+            <p className="text-[9px] text-teal-400 font-bold uppercase tracking-[0.2em] drop-shadow-[0_0_5px_rgba(45,212,191,0.5)]">Online</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <button className="p-2 text-primary-main opacity-50"><Phone size={20} /></button>
-          <button className="p-2 text-primary-main opacity-50"><Video size={20} /></button>
+        <div className="flex items-center gap-2">
+          <button className="p-3 glass-panel rounded-full text-white/70 hover:text-primary-light active:scale-95 transition-all"><Phone size={18} /></button>
+          <button className="p-3 glass-panel rounded-full text-white/70 hover:text-primary-light active:scale-95 transition-all"><Video size={18} /></button>
         </div>
       </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {loading ? (
           <div className="flex-1 flex items-center justify-center p-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary-main" />
+            <div className="animate-[spin_2s_linear_infinite] rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-main shadow-[0_0_15px_rgba(191,97,255,0.5)]"></div>
           </div>
         ) : (
           <AnimatePresence>
@@ -138,15 +138,15 @@ export default function ChatScreen() {
                   )}
                 >
                   <div className={cn(
-                    "px-4 py-3 rounded-2xl text-sm font-medium shadow-sm",
+                    "px-5 py-3.5 rounded-[24px] text-base font-medium shadow-md max-w-full backdrop-blur-md",
                     isMine 
-                      ? "bg-primary-main text-white rounded-br-none" 
-                      : "bg-white text-gray-800 rounded-bl-none border border-gray-100"
+                      ? "bg-linear-to-br from-primary-main to-secondary-main text-white rounded-br-sm shadow-[0_5px_20px_rgba(191,97,255,0.3)]" 
+                      : "glass-panel border border-white/10 text-white rounded-bl-sm"
                   )}>
                     {msg.text}
                   </div>
                   {msg.createdAt && (
-                    <span className="text-[10px] text-gray-400 mt-1 px-1">
+                    <span className="text-[9px] text-white/40 mt-1.5 px-2 font-bold tracking-widest uppercase">
                       {format(msg.createdAt.toDate(), 'HH:mm')}
                     </span>
                   )}
@@ -159,24 +159,26 @@ export default function ChatScreen() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-4 bg-white border-t border-gray-100 pb-10">
-        <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-4 py-2">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            className="flex-1 bg-transparent border-none focus:outline-hidden py-2 text-sm"
-          />
-          <button 
-            type="submit" 
-            disabled={!inputText.trim()}
-            className="w-10 h-10 gradient-primary rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-all active:scale-90"
-          >
-            <Send size={18} />
-          </button>
-        </div>
-      </form>
+      <div className="p-4 bg-transparent pb-8">
+        <form onSubmit={handleSend} className="glass-panel p-2 rounded-full border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+          <div className="flex items-center gap-2 bg-black/20 rounded-full px-4 py-1">
+            <input
+              type="text"
+              placeholder="Message..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              className="flex-1 bg-transparent border-none focus:outline-hidden py-3 text-white placeholder:text-white/40 font-medium text-base"
+            />
+            <button 
+              type="submit" 
+              disabled={!inputText.trim()}
+              className="w-12 h-12 bg-linear-to-br from-primary-main to-secondary-main rounded-full flex items-center justify-center text-white disabled:opacity-30 disabled:grayscale transition-all active:scale-90 shadow-[0_0_15px_rgba(191,97,255,0.4)]"
+            >
+              <Send size={20} className="ml-1" />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

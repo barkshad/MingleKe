@@ -38,34 +38,36 @@ export default function LandingScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-8 gradient-primary text-white">
+    <div className="flex-1 flex flex-col p-8 text-white relative z-10 w-full">
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="bg-white/20 p-4 rounded-3xl mb-6 backdrop-blur-sm"
+          className="w-32 h-32 rounded-3xl mb-8 flex items-center justify-center bg-linear-to-br from-primary-main to-secondary-main shadow-[0_0_50px_rgba(255,77,141,0.5)]"
         >
-          <Heart size={64} fill="white" className="text-white" />
+          <Heart size={64} fill="white" className="text-white drop-shadow-md" />
         </motion.div>
+        
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl font-bold mb-2"
+          className="text-6xl font-black mb-3 tracking-tighter"
         >
           MingleKE
         </motion.h1>
+        
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-lg opacity-90 max-w-[280px]"
+          className="text-xl text-white/70 max-w-[280px] font-medium"
         >
           Discover meaningful connections in Kenya.
         </motion.p>
       </div>
 
-      <div className="space-y-4 mb-8">
+      <div className="space-y-4 mb-8 w-full max-w-sm mx-auto">
         <AnimatePresence mode="wait">
           {view === 'welcome' ? (
             <motion.div
@@ -77,29 +79,29 @@ export default function LandingScreen() {
             >
               <button
                 onClick={() => setView('email-signup')}
-                className="w-full bg-white text-primary-main font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all"
+                className="btn-primary"
               >
                 Create Account
               </button>
               <button
                 onClick={() => setView('email-login')}
-                className="w-full bg-white/20 border border-white/30 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all backdrop-blur-sm"
+                className="btn-secondary"
               >
                 Log In
               </button>
               
-              <div className="flex items-center gap-4 my-6">
+              <div className="flex items-center gap-4 my-6 opacity-60">
                 <div className="h-[1px] flex-1 bg-white/30" />
-                <span className="text-sm opacity-60">or continue with</span>
+                <span className="text-xs uppercase tracking-widest font-bold">or continue with</span>
                 <div className="h-[1px] flex-1 bg-white/30" />
               </div>
 
               <button
                 onClick={handleGoogleLogin}
-                className="w-full bg-white text-gray-800 font-semibold py-3 rounded-2xl flex items-center justify-center gap-3 shadow-md active:scale-95 transition-all"
+                className="w-full glass-panel text-white font-bold py-4 rounded-full flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(0,0,0,0.2)] active:scale-[0.98] transition-all"
               >
-                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                Google
+                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 bg-white p-0.5 rounded-full" />
+                Sign in with Google
               </button>
             </motion.div>
           ) : (
@@ -109,7 +111,7 @@ export default function LandingScreen() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               onSubmit={handleEmailAuth}
-              className="space-y-4"
+              className="glass-panel p-6 rounded-[32px] space-y-6 shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative overflow-hidden"
             >
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold">{view === 'email-login' ? 'Welcome Back' : 'Get Started'}</h2>

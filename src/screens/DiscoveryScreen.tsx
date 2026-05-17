@@ -149,14 +149,14 @@ export default function DiscoveryScreen() {
   const currentProfile = profiles[currentIndex];
 
   return (
-    <div className="flex-1 flex flex-col pt-4 px-4 overflow-hidden bg-gray-50">
+    <div className="flex-1 flex flex-col pt-4 px-4 overflow-hidden relative z-10">
       {/* Header */}
       <header className="flex items-center justify-between px-2 mb-4">
-        <h1 className="text-2xl font-black text-primary-main flex items-center gap-2">
-          <Heart className="fill-primary-main" size={24} />
+        <h1 className="text-2xl font-black text-white flex items-center gap-2 drop-shadow-md">
+          <Heart className="fill-primary-main text-primary-main" size={24} />
           MingleKE
         </h1>
-        <button className="p-2 bg-white rounded-full shadow-sm text-gray-400 hover:text-gray-700 transition-colors">
+        <button className="p-3 glass-panel rounded-full shadow-sm text-white hover:text-primary-light transition-colors">
           <Filter size={20} />
         </button>
       </header>
@@ -246,41 +246,41 @@ export default function DiscoveryScreen() {
               </div>
             </motion.div>
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-6">
-              <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center">
-                 <Compass size={64} className="text-gray-300 animate-spin-slow" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-6">
+                <div className="w-32 h-32 glass-panel rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(191,97,255,0.2)]">
+                   <Compass size={64} className="text-primary-light animate-[spin_4s_linear_infinite]" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-bold text-white">That's everyone!</h3>
+                  <p className="text-white/60">Try expanding your search radius or update your preferences.</p>
+                </div>
+                <button 
+                  onClick={fetchProfiles}
+                  className="btn-primary w-full mt-4"
+                >
+                  Refresh Search
+                </button>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-gray-800">That's everyone for now!</h3>
-                <p className="text-gray-500">Try expanding your search radius or update your preferences to find more people.</p>
-              </div>
-              <button 
-                onClick={fetchProfiles}
-                className="btn-secondary w-full"
-              >
-                Refresh Search
-              </button>
-            </div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Actions */}
-      <div className="h-28 flex items-center justify-center gap-6">
+      <div className="h-40 flex items-center justify-center gap-6 pb-20">
         <button 
           onClick={() => { x.set(-300); setTimeout(() => handleSwipe('left'), 200); }}
-          className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-red-500 border border-slate-100 active:scale-90 transition-transform"
+          className="w-16 h-16 glass-panel rounded-full flex items-center justify-center text-secondary-light active:scale-[0.85] transition-all duration-300 shadow-[0_0_20px_rgba(255,77,141,0.2)] hover:shadow-[0_0_30px_rgba(255,77,141,0.4)]"
         >
-          <X size={32} strokeWidth={3} />
+          <X size={28} strokeWidth={3} />
         </button>
         <button 
            onClick={() => { x.set(300); setTimeout(() => handleSwipe('right'), 200); }}
-           className="w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center text-accent-teal border border-slate-100 active:scale-95 transition-transform"
+           className="w-20 h-20 bg-linear-to-br from-primary-main to-secondary-main rounded-full flex items-center justify-center text-white active:scale-[0.85] transition-all duration-300 shadow-[0_0_30px_rgba(191,97,255,0.4)] hover:shadow-[0_0_50px_rgba(191,97,255,0.6)]"
         >
-          <Heart size={44} fill="currentColor" strokeWidth={0} />
+          <Heart size={38} fill="currentColor" strokeWidth={0} />
         </button>
-        <button className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center text-primary-light border border-slate-100 active:scale-90 transition-transform">
-          <Sparkles size={32} fill="currentColor" strokeWidth={0} />
+        <button className="w-16 h-16 glass-panel rounded-full flex items-center justify-center text-accent-teal active:scale-[0.85] transition-all duration-300 shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)]">
+          <Sparkles size={28} fill="currentColor" strokeWidth={0} />
         </button>
       </div>
 

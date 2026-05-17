@@ -1,56 +1,98 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
 
-  --color-primary-main: #9333ea; /* Purple 600 */
-  --color-primary-light: #a855f7; /* Purple 500 */
-  --color-primary-dark: #7e22ce; /* Purple 700 */
-  --color-secondary-main: #ec4899; /* Pink 500 */
-  --color-secondary-light: #f472b6; /* Pink 400 */
-  --color-secondary-dark: #db2777; /* Pink 600 */
+  --color-base-dark: #070308;
+  --color-base-panel: rgba(23, 14, 27, 0.6);
+  --color-base-border: rgba(255, 255, 255, 0.08);
+
+  --color-primary-main: #bf61ff; /* Bright Premium Purple */
+  --color-primary-light: #d896ff; 
+  --color-primary-dark: #8120cc; 
   
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-700: #334155;
-  --color-slate-800: #1e293b;
+  --color-secondary-main: #ff4d8d; /* Vibrant Pink */
+  --color-secondary-light: #ff85b3; 
+  --color-secondary-dark: #cc1b5b; 
   
-  --color-accent-teal: #2dd4bf;
+  --color-slate-50: #ffffff; /* Override for dark mode text */
+  --color-slate-100: rgba(255,255,255,0.9);
+  --color-slate-200: rgba(255,255,255,0.8);
+  --color-slate-300: rgba(255,255,255,0.7);
+  --color-slate-400: rgba(255,255,255,0.5);
+  --color-slate-500: rgba(255,255,255,0.4);
+  --color-slate-700: rgba(255,255,255,0.2);
+  --color-slate-800: rgba(255,255,255,0.1);
+  --color-slate-900: rgba(255,255,255,0.05);
+  
+  --color-accent-teal: #00f0ff; /* Cyber cyan for premium accent */
 }
 
 @layer base {
   body {
-    @apply font-sans bg-slate-50 text-slate-800 overflow-x-hidden;
+    @apply font-sans bg-[#070308] text-slate-100 overflow-x-hidden antialiased selection:bg-primary-main/30 flex justify-center;
     -webkit-tap-highlight-color: transparent;
+    background: radial-gradient(circle at 50% 0%, #1a0823 0%, var(--color-base-dark) 100%);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+    @apply font-display tracking-tight text-white;
   }
 }
 
 .mobile-container {
-  @apply max-w-md mx-auto min-h-screen bg-white shadow-2xl relative flex flex-col border-x border-slate-100;
+  @apply w-full max-w-md mx-auto min-h-[100dvh] relative flex flex-col overflow-hidden;
+  background: var(--color-base-dark);
 }
 
-.gradient-primary {
+@media (min-width: 768px) {
+  .mobile-container {
+    min-height: 850px;
+    height: 90vh;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 25px 50px -12px rgba(191, 97, 255, 0.25);
+  }
+}
+
+/* Ambient glow backgrounds */
+.mobile-container::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: -20%; width: 140%; height: 140%;
+  background: radial-gradient(circle at 10% 20%, rgba(191,97,255,0.15) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(255,77,141,0.15) 0%, transparent 40%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@utility gradient-primary {
   @apply bg-linear-to-br from-[var(--color-primary-main)] to-[var(--color-secondary-main)];
 }
 
-.btn-primary {
-  @apply bg-linear-to-br from-[var(--color-primary-main)] to-[var(--color-secondary-main)] text-white font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all active:scale-95 text-center;
+@utility gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary-main)] to-[var(--color-secondary-main)];
 }
 
-.btn-secondary {
-  @apply bg-purple-50 text-[var(--color-primary-main)] border border-purple-100 font-bold py-4 px-6 rounded-2xl shadow-sm hover:bg-purple-100 transition-all active:scale-95 text-center;
+@utility btn-primary {
+  @apply relative overflow-hidden bg-white text-black font-extrabold py-4 px-8 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] transition-all duration-300 active:scale-[0.97] text-center w-full z-10;
 }
 
-.card-container {
-  @apply bg-white rounded-[40px] shadow-2xl border-8 border-white overflow-hidden;
+@utility btn-secondary {
+  @apply bg-slate-900 text-white border border-slate-700 font-bold py-4 px-6 rounded-full hover:bg-slate-800 transition-all active:scale-[0.97] text-center w-full backdrop-blur-md;
+}
+
+@utility glass-panel {
+  @apply bg-[var(--color-base-panel)] backdrop-blur-2xl border border-[var(--color-base-border)] shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+}
+
+@utility card-container {
+  @apply glass-panel rounded-[32px] overflow-hidden;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 20px 40px rgba(0,0,0,0.5);
 }
 
