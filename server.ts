@@ -3,6 +3,10 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
 import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 async function startServer() {
   const app = express();
@@ -19,10 +23,9 @@ async function startServer() {
   });
 
   // API Route: Upload Image to Cloudinary
-  app.post("/api/upload", async (req, res) => {
+  app.post("/api/upload", upload.single('file'), async (req, res) => {
     try {
-      const { file } = req.body; // base64 string
-      if (!file) {
+      if (!req.file) {
         return res.status(400).json({ error: "No file provided" });
       }
 
@@ -32,7 +35,10 @@ async function startServer() {
         return res.json({ url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}` });
       }
 
-      const uploadResponse = await cloudinary.uploader.upload(file, {
+      const b64 = Buffer.from(req.file.buffer).toString('base64');
+      const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      
+      const uploadResponse = await cloudinary.uploader.upload(dataURI, {
         folder: 'mingleke',
       });
       console.log('Cloudinary upload success');

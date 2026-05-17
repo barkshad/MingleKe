@@ -314,33 +314,30 @@ export default function OnboardingScreen() {
                             const file = e.target.files?.[0];
                             if (file) {
                               setUploadingIndex(idx);
-                              const reader = new FileReader();
-                              reader.onloadend = async () => {
-                                const base64 = reader.result as string;
-                                try {
-                                  // Indicate loading (you could add a dedicated loading state array for UI)
-                                  const res = await fetch('/api/upload', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ file: base64 })
-                                  });
-                                  const json = await res.json();
-                                  if (!res.ok) {
-                                    throw new Error(json.error || 'Upload failed');
-                                  }
-                                  if (json.url) {
-                                    const newPhotos = [...data.photos];
-                                    newPhotos[idx] = json.url;
-                                    setData({ ...data, photos: newPhotos });
-                                  }
-                                } catch (error) {
-                                  console.error("Upload failed", error);
-                                  alert("Failed to upload image.");
-                                } finally {
-                                  setUploadingIndex(null);
+                              try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                
+                                const res = await fetch('/api/upload', {
+                                  method: 'POST',
+                                  body: formData
+                                });
+                                const json = await res.json();
+                                if (!res.ok) {
+                                  throw new Error(json.error || 'Upload failed');
                                 }
-                              };
-                              reader.readAsDataURL(file);
+                                if (json.url) {
+                                  const newPhotos = [...data.photos];
+                                  newPhotos[idx] = json.url;
+                                  setData({ ...data, photos: newPhotos });
+                                }
+                              } catch (error) {
+                                console.error("Upload failed", error);
+                                alert("Failed to upload image.");
+                              } finally {
+                                setUploadingIndex(null);
+                                e.target.value = ''; // allow uploading the same file again
+                              }
                             }
                           }}
                         />
