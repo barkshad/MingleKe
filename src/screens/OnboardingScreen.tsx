@@ -84,15 +84,14 @@ export default function OnboardingScreen() {
         return;
       }
 
+      // We no longer trigger window.open here. The button is now an anchor tag that opens it natively.
+      
       const response = await fetch('/api/mpesa/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneNumber }),
       });
 
-      // Open the payment link in a new window / in-app browser
-      window.open('https://lipana.dev/pay/mingleke', '_blank');
-      
       alert("Please complete the payment in the opened browser window. We are waiting for confirmation...");
       
       // Start polling for payment status
@@ -468,13 +467,19 @@ export default function OnboardingScreen() {
                         <p className="font-bold">Payment Successful!</p>
                       </div>
                     ) : (
-                      <button 
-                        onClick={handleMpesaPayment}
+                      <a 
+                        href="https://lipana.dev/pay/mingleke"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                          // Let the link open natively for 100% reliability, then handle tracking
+                          handleMpesaPayment();
+                        }}
                         className="w-full btn-primary flex items-center justify-center gap-3"
                       >
                         <CreditCard size={20} />
                         Pay KES 100 via Lipana
-                      </button>
+                      </a>
                     )}
                   </div>
                 </>
