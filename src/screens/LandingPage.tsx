@@ -1,9 +1,9 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { ArrowRight, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FreeCountdown } from '../components/FreeCountdown';
 import { isFreeWindow, freeWindowTextLabel } from '../lib/promo';
+import { useAuth } from '../context/AuthContext';
 
 const steps = [
   {
@@ -25,6 +25,13 @@ const steps = [
 
 export default function LandingPage() {
   const free = isFreeWindow();
+  const navigate = useNavigate();
+  const { enterGuestMode } = useAuth();
+
+  const openApp = () => {
+    enterGuestMode();
+    navigate('/');
+  };
 
   return (
     <div className="flex-1 overflow-y-auto bg-ink text-bone pb-16">
@@ -63,10 +70,10 @@ export default function LandingPage() {
           )}
 
           <div className="flex flex-col gap-2 max-w-sm">
-            <Link to="/welcome" className="btn-primary inline-flex items-center justify-center gap-2">
-              {free ? 'Claim free pass' : 'Join MingleKE'}
+            <button type="button" onClick={openApp} className="btn-primary inline-flex items-center justify-center gap-2">
+              {free ? 'Open the app' : 'Open MingleKE'}
               <ArrowRight size={16} />
-            </Link>
+            </button>
             <Link to="/welcome" className="btn-secondary">
               Log in
             </Link>
@@ -127,9 +134,9 @@ export default function LandingPage() {
           Android Chrome: menu → Add to Home screen. iPhone Safari: Share → Add to Home Screen.
           Desktop browsers show an install icon in the address bar.
         </p>
-        <Link to="/welcome" className="btn-primary">
+        <button type="button" onClick={openApp} className="btn-primary">
           Get the app
-        </Link>
+        </button>
       </section>
 
       <footer className="px-5 py-8">
@@ -141,9 +148,9 @@ export default function LandingPage() {
           <br />
           Start a conversation.
         </p>
-        <Link to="/welcome" className="btn-secondary">
+        <button type="button" onClick={openApp} className="btn-secondary">
           Start mingling
-        </Link>
+        </button>
         <p className="type-meta mt-5">MingleKE · Nairobi</p>
       </footer>
     </div>

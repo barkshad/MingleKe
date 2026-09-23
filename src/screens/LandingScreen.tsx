@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, ArrowLeft, Mail, KeyRound } from 'lucide-react';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from 'firebase/auth';
+import { ArrowLeft, Mail, KeyRound } from 'lucide-react';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate, Link } from 'react-router-dom';
 import { friendlyAuthError } from '../lib/utils';
+import { useAuth } from '../context/AuthContext';
 import { FreeCountdown } from '../components/FreeCountdown';
 import { useToast } from '../components/Toast';
 
@@ -22,24 +19,17 @@ export default function LandingScreen() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const toast = useToast((s) => s.show);
+  const { enterGuestMode } = useAuth();
+
+  const handleInspect = () => {
+    enterGuestMode();
+    navigate('/');
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setBusy(true);
-    try {
-      if (view === 'email-login') {
-        await signInWithEmailAndPassword(auth, email, password);
-        navigate('/');
-      } else if (view === 'email-signup') {
-        await createUserWithEmailAndPassword(auth, email, password);
-        navigate('/onboarding');
-      }
-    } catch (err: any) {
-      setError(friendlyAuthError(err?.code || err?.message || 'Could not continue'));
-    } finally {
-      setBusy(false);
-    }
+    // Inspection mode: any login opens the app without Firebase.
+    handleInspect();
   };
 
   const handleReset = async (e: React.FormEvent) => {
@@ -97,12 +87,15 @@ export default function LandingScreen() {
               exit={{ opacity: 0 }}
               className="space-y-2 max-w-sm"
             >
-              <button onClick={() => setView('email-signup')} className="btn-primary">
-                Create account
-              </button>
-              <button onClick={() => setView('email-login')} className="btn-secondary">
+              <button type="button" onClick={handleInspect} className="btn-primary">
                 Log in
               </button>
+              <button type="button" onClick={handleInspect} className="btn-secondary">
+                Create account
+              </button>
+              <p className="type-meta mt-3 normal-case tracking-normal font-sans text-xs leading-relaxed">
+                Inspect mode is on: login skips Firebase and opens the full app so you can look around.
+              </p>
             </motion.div>
           )}
 

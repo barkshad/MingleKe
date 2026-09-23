@@ -21,11 +21,39 @@ export interface UserProfile {
   showMe?: 'men' | 'women' | 'everyone';
 }
 
+const GUEST_UID = 'guest-inspect';
+
+const guestProfile: UserProfile = {
+  uid: GUEST_UID,
+  name: 'Guest',
+  age: 24,
+  gender: 'male',
+  interestedIn: 'women',
+  bio: 'Inspecting MingleKE. Not a live account.',
+  photos: [],
+  location: { city: 'Nairobi' },
+  interests: ['Tech', 'Food', 'Music'],
+  onboarded: true,
+  paymentStatus: 'completed',
+  maxDistanceKm: 50,
+  ageRange: { min: 18, max: 45 },
+  showMe: 'women',
+};
+
+type SessionUser = {
+  uid: string;
+  isGuest: boolean;
+  raw: FirebaseUser | null;
+};
+
 interface AuthContextType {
-  user: FirebaseUser | null;
+  user: SessionUser | null;
   profile: UserProfile | null;
   loading: boolean;
   profileLoading: boolean;
+  isGuest: boolean;
+  enterGuestMode: () => void;
+  exitGuestMode: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   saveProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
@@ -33,11 +61,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
-  const userRef = useRef<FirebaseUser | null>(null);
+  const userRef = useRef<SessionUser | null>(null);
   const unsubProfileRef = useRef<(() => void) | null>(null);
 
   const loadProfile = useCallback(async (uid: string) => {
@@ -58,20 +86,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err) {
       console.error('Failed to load profile', err);
+      setProfile(null);
     } finally {
       setProfileLoading(false);
     }
   }, []);
 
+  const enterGuestMode = useCallback(() => {
+    unsubProfileRef.current?.();
+    unsubProfileRef.current = null;
+    const session: SessionUser = { uid: GUEST_UID, isGuest: true, raw: null };
+    userRef.current = session;
+    setUser(session);
+    setProfile(guestProfile);
+    setLoading(false);
+    try {
+      localStorage.setItem('mingleke-guest', '1');
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const exitGuestMode = useCallback(async () => {
+    try {
+      localStorage.removeItem('mingleke-guest');
+    } catch {
+      // ignore
+    }
+    unsubProfileRef.current?.();
+    unsubProfileRef.current = null;
+    userRef.current = null;
+    setUser(null);
+    setProfile(null);
+    setLoading(false);
+  }, []);
+
   const refreshProfile = useCallback(async () => {
     const current = userRef.current;
     if (!current) return;
+    if (current.isGuest) {
+      setProfile((p) => (p ? { ...p, ...guestProfile, ...p } : guestProfile));
+      return;
+    }
     await loadProfile(current.uid);
   }, [loadProfile]);
 
   const saveProfile = useCallback(async (data: Partial<UserProfile>) => {
     const current = userRef.current;
     if (!current) throw new Error('Not signed in');
+    if (current.isGuest) {
+      setProfile((prev) => {
+        const next = { ...(prev || guestProfile), ...data, uid: GUEST_UID, onboarded: true };
+        try {
+          localStorage.setItem('mingleke-guest-profile', JSON.stringify(next));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+      return;
+    }
     const ref = doc(db, 'users', current.uid);
     const payload = { ...data, lastActive: new Date().toISOString() };
     const snap = await getDoc(ref);
@@ -84,14 +158,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadProfile]);
 
   useEffect(() => {
+    // Restore guest session so refresh keeps you inside the app for inspection.
+    try {
+      if (localStorage.getItem('mingleke-guest') === '1') {
+        const saved = localStorage.getItem('mingleke-guest-profile');
+        const session: SessionUser = { uid: GUEST_UID, isGuest: true, raw: null };
+        userRef.current = session;
+        setUser(session);
+        setProfile(saved ? { ...guestProfile, ...JSON.parse(saved) } : guestProfile);
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // fall through to Firebase
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      userRef.current = firebaseUser;
-      setUser(firebaseUser);
-      unsubProfileRef.current?.();
-      unsubProfileRef.current = null;
       if (firebaseUser) {
+        const session: SessionUser = { uid: firebaseUser.uid, isGuest: false, raw: firebaseUser };
+        userRef.current = session;
+        setUser(session);
         await loadProfile(firebaseUser.uid);
       } else {
+        userRef.current = null;
+        setUser(null);
         setProfile(null);
       }
       setLoading(false);
@@ -104,7 +194,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadProfile]);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, profileLoading, refreshProfile, saveProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        profileLoading,
+        isGuest: !!user?.isGuest,
+        enterGuestMode,
+        exitGuestMode,
+        refreshProfile,
+        saveProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

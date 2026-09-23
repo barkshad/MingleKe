@@ -11,7 +11,7 @@ import { useToast } from '../components/Toast';
 import { FreeCountdown } from '../components/FreeCountdown';
 
 export default function ProfileScreen() {
-  const { profile, user } = useAuth();
+  const { profile, user, isGuest, exitGuestMode } = useAuth();
   const navigate = useNavigate();
   const toast = useToast((s) => s.show);
   const [matchCount, setMatchCount] = useState(0);
@@ -32,6 +32,11 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     try {
+      if (isGuest) {
+        await exitGuestMode();
+        navigate('/welcome');
+        return;
+      }
       await signOut(auth);
       navigate('/home');
     } catch {
@@ -115,11 +120,17 @@ export default function ProfileScreen() {
             </p>
           )}
 
+          {isGuest && (
+            <p className="type-meta mb-4 border border-dashed border-hibiscus/50 px-3 py-2 text-hibiscus">
+              Inspect mode — changes stay in this browser only
+            </p>
+          )}
+
           <button
             onClick={handleLogout}
             className="w-full border border-hibiscus/40 text-hibiscus type-display uppercase tracking-wider py-4 rounded-md hover:bg-hibiscus/10 min-h-[56px]"
           >
-            Log out
+            {isGuest ? 'Exit inspect mode' : 'Log out'}
           </button>
 
           <p className="type-meta mt-6 text-center">MingleKE 2.1 · Nairobi</p>
