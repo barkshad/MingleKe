@@ -118,8 +118,8 @@ export default function ChatScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col relative z-10 text-bone bg-ink pb-2">
-      <header className="flex items-center gap-2 px-3 py-3 border-b border-line">
+    <div className="flex-1 flex flex-col relative z-10 text-bone bg-ink min-h-0">
+      <header className="flex items-center gap-2 page-pad py-3 border-b border-line shrink-0">
         <button
           onClick={() => navigate('/matches')}
           className="p-2 text-bone-dim hover:text-bone min-h-[44px] min-w-[44px]"
@@ -143,7 +143,7 @@ export default function ChatScreen() {
         </Link>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-3">
+      <div className="flex-1 overflow-y-auto page-pad py-4 space-y-3 min-h-0">
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 border border-line border-t-hibiscus animate-spin" />
@@ -195,19 +195,19 @@ export default function ChatScreen() {
         <div ref={scrollRef} />
       </div>
 
-      <form onSubmit={handleSend} className="flex gap-2 px-3 pb-3 border-t border-line pt-3">
+      <form onSubmit={handleSend} className="flex gap-2 page-pad pb-3 pt-3 border-t border-line shrink-0">
         <input
           type="text"
           placeholder="Write something real…"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="input-field flex-1 py-3"
+          className="input-field flex-1 py-3 min-w-0"
           maxLength={2000}
         />
         <button
           type="submit"
           disabled={!inputText.trim() || sending}
-          className="btn-primary !w-auto px-4 shrink-0"
+          className="btn-primary !w-auto px-4 shrink-0 flex items-center justify-center"
           aria-label="Send"
         >
           <Send size={16} />

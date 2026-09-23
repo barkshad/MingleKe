@@ -44,7 +44,7 @@ export function ShiftingPhotoWall() {
   const nextPhoto = hero[(index + 1) % hero.length]?.photos?.[0] || photo;
 
   return (
-    <div className="relative min-h-[72vh] overflow-hidden border-b border-line bg-ink">
+    <div className="relative w-full overflow-hidden border-b border-line bg-ink aspect-[3/4] min-h-[360px] max-h-[min(72vh,640px)] sm:aspect-[4/5] sm:max-h-[min(70vh,620px)]">
       {/* stacked plates */}
       <AnimatePresence initial={false} custom={dir} mode="popLayout">
         <motion.div
@@ -120,7 +120,7 @@ export function ShiftingPhotoWall() {
       </div>
 
       {/* nameplate */}
-      <div className="absolute inset-x-4 bottom-16 z-20">
+      <div className="absolute inset-x-3 sm:inset-x-4 bottom-14 sm:bottom-16 z-20">
         <AnimatePresence mode="wait">
           <motion.div
             key={current?.uid}
@@ -129,7 +129,7 @@ export function ShiftingPhotoWall() {
             exit={reduce ? { opacity: 0 } : { y: -8, opacity: 0 }}
             transition={{ duration: 0.35 }}
           >
-            <h2 className="nameplate text-3xl sm:text-4xl max-w-max">
+            <h2 className="nameplate text-xl sm:text-2xl md:text-3xl max-w-full truncate">
               {current?.name}
               {current?.age ? `, ${current.age}` : ''}
             </h2>
@@ -143,15 +143,16 @@ export function ShiftingPhotoWall() {
 
       {/* dual drifting rails */}
       {!reduce && (
-        <div className="absolute bottom-0 inset-x-0 z-20 py-2 space-y-1 overflow-hidden">
+        <div className="absolute bottom-0 inset-x-0 z-20 py-1.5 space-y-1 overflow-hidden">
           <div className="flex gap-1 w-max animate-marquee-left">
             {[...railTop, ...railTop].map((p, i) => (
               <img
                 key={`t-${p.uid}-${i}`}
                 src={p.photos?.[0]}
                 alt=""
-                className="h-12 w-9 object-cover object-top border border-line/80 shrink-0 grayscale hover:grayscale-0 transition"
+                className="h-10 w-8 sm:h-12 sm:w-9 object-cover object-top border border-line/80 shrink-0 grayscale hover:grayscale-0 transition"
                 draggable={false}
+                loading="lazy"
               />
             ))}
           </div>
@@ -161,8 +162,9 @@ export function ShiftingPhotoWall() {
                 key={`b-${p.uid}-${i}`}
                 src={p.photos?.[0]}
                 alt=""
-                className="h-12 w-9 object-cover object-top border border-line/80 shrink-0 grayscale hover:grayscale-0 transition"
+                className="h-10 w-8 sm:h-12 sm:w-9 object-cover object-top border border-line/80 shrink-0 grayscale hover:grayscale-0 transition"
                 draggable={false}
+                loading="lazy"
               />
             ))}
           </div>

@@ -35,30 +35,30 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-ink text-bone pb-16">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden bg-ink text-bone pb-16">
       {/* Shifting plates showcase */}
       <header className="relative">
         <ShiftingPhotoWall />
       </header>
 
       {/* Masthead copy under the shifter so the photos stay the show */}
-      <section className="px-5 py-6 border-b border-line">
+      <section className="page-pad py-6 border-b border-line">
         <p className="type-meta mb-3">Kenya · 18+ · Free this week</p>
-        <h1 className="type-display text-[52px] sm:text-[60px] leading-[0.88] mb-3">
+        <h1 className="fluid-display mb-3">
           Mingle
           <span className="text-hibiscus">KE</span>
         </h1>
-        <p className="text-bone text-base leading-snug max-w-[300px] mb-5">
+        <p className="text-bone text-base leading-snug max-w-[32ch] mb-5">
           The deck shifts. Pick one and open the real thing.
         </p>
 
         {free && (
-          <div className="mb-4 max-w-sm">
+          <div className="mb-4 max-w-md">
             <FreeCountdown />
           </div>
         )}
 
-        <div className="flex flex-col gap-2 max-w-sm">
+        <div className="flex flex-col gap-2 max-w-md">
           <button type="button" onClick={openApp} className="btn-primary inline-flex items-center justify-center gap-2">
             {free ? 'Open the app' : 'Open MingleKE'}
             <ArrowRight size={16} />
@@ -75,8 +75,8 @@ export default function LandingPage() {
       </section>
 
       {/* How */}
-      <section className="px-5 py-8 border-b border-line">
-        <h2 className="type-display text-3xl mb-5">How it runs</h2>
+      <section className="page-pad py-8 border-b border-line">
+        <h2 className="fluid-display-sm mb-5">How it runs</h2>
         <div className="space-y-0">
           {steps.map((step, i) => (
             <div
@@ -94,7 +94,7 @@ export default function LandingPage() {
       </section>
 
       {/* Preview plate */}
-      <section className="px-5 py-8 border-b border-line">
+      <section className="page-pad py-8 border-b border-line">
         <p className="type-meta mb-3">From the deck</p>
         <div className="plate">
           <div className="relative aspect-[3/4]">
@@ -116,8 +116,8 @@ export default function LandingPage() {
       </section>
 
       {/* Install */}
-      <section className="px-5 py-8 border-b border-line">
-        <h2 className="type-display text-3xl mb-3">Put it on your home screen</h2>
+      <section className="page-pad py-8 border-b border-line">
+        <h2 className="fluid-display-sm mb-3">Put it on your home screen</h2>
         <p className="text-bone-dim text-sm leading-relaxed mb-4">
           Android Chrome: menu → Add to Home screen. iPhone Safari: Share → Add to Home Screen.
           Desktop browsers show an install icon in the address bar.
@@ -127,11 +127,11 @@ export default function LandingPage() {
         </button>
       </section>
 
-      <footer className="px-5 py-8">
+      <footer className="page-pad py-8">
         {free && (
           <p className="type-meta text-hibiscus mb-2">Free until {freeWindowTextLabel()}</p>
         )}
-        <p className="type-display text-2xl mb-4 leading-tight">
+        <p className="fluid-display-sm mb-4 leading-tight">
           Open the deck.
           <br />
           Start a conversation.

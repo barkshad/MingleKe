@@ -241,7 +241,7 @@ export default function OnboardingScreen() {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 pt-10 pb-8 flex flex-col">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden page-pad pt-8 sm:pt-10 pb-8 flex flex-col min-h-0">
         {freeNow && step < 9 && (
           <div className="mb-5">
             <FreeCountdown compact />
@@ -256,7 +256,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">What's your gender?</h1>
+              <h1 className="fluid-display">What's your gender?</h1>
               <div className="grid grid-cols-1 gap-3">
                 {(['male', 'female', 'other'] as const).map((g) => (
                   <button
@@ -288,7 +288,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">Who are you interested in?</h1>
+              <h1 className="fluid-display">Who are you interested in?</h1>
               <div className="grid grid-cols-1 gap-3">
                 {(['men', 'women', 'everyone'] as const).map((pref) => (
                   <button
@@ -320,7 +320,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">When is your birthday?</h1>
+              <h1 className="fluid-display">When is your birthday?</h1>
               <div className="space-y-4">
                 <div className="flex glass-panel border border-line p-4 rounded-3xl items-center gap-3">
                   <Calendar className="text-mist" size={24} />
@@ -336,7 +336,7 @@ export default function OnboardingScreen() {
                       if (val.length > 10) val = val.slice(0, 10);
                       setData({ ...data, birthday: val });
                     }}
-                    className="bg-transparent flex-1 focus:outline-none font-bold text-xl text-cream tracking-widest"
+                    className="bg-transparent flex-1 focus:outline-none font-bold text-lg sm:text-xl text-cream tracking-widest min-w-0"
                   />
                 </div>
                 <p className="text-sm text-mist">
@@ -363,7 +363,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">What's your name?</h1>
+              <h1 className="fluid-display">What's your name?</h1>
               <div className="space-y-4">
                 <input
                   type="text"
@@ -388,7 +388,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">Where are you?</h1>
+              <h1 className="fluid-display">Where are you?</h1>
               <div className="space-y-3">
                 <button
                   onClick={detectLocation}
@@ -430,7 +430,7 @@ export default function OnboardingScreen() {
               className="space-y-6"
             >
               <div className="flex justify-between items-end">
-                <h1 className="text-4xl font-bold">Add 3 photos</h1>
+                <h1 className="fluid-display">Add 3 photos</h1>
                 <span className="text-base font-bold text-mist">{photoCount}/3</span>
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -493,7 +493,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">About you</h1>
+              <h1 className="fluid-display">About you</h1>
               <textarea
                 placeholder="A short bio. What should someone know before saying hi?"
                 value={data.bio}
@@ -561,7 +561,7 @@ export default function OnboardingScreen() {
               exit={{ opacity: 0, x: -16 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl font-bold">You are in — free</h1>
+              <h1 className="fluid-display">You are in — free</h1>
               <FreeCountdown />
               <p className="text-mist text-base leading-relaxed">
                 Verification fees are paused this week. Finish setup and start mingling.
@@ -663,7 +663,7 @@ export default function OnboardingScreen() {
         </AnimatePresence>
       </div>
 
-      <div className="px-8 pb-10 flex justify-between items-center">
+      <div className="page-pad pb-8 flex justify-between items-center gap-3">
         {step > 1 && step < 9 && !isPaying ? (
           <button onClick={prevStep} className="btn-ghost inline-flex items-center gap-1 min-h-[44px]">
             <ArrowLeft size={18} /> Back

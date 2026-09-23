@@ -29,7 +29,7 @@ export function ToastHost() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 8 }}
           onClick={hide}
-          className="fixed bottom-20 inset-x-4 z-[80] max-w-sm mx-auto text-left"
+          className="fixed bottom-20 inset-x-3 sm:inset-x-4 z-[80] max-w-md mx-auto text-left"
         >
           <div
             className={cnToast(tone)}

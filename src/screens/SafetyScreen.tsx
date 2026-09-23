@@ -30,19 +30,19 @@ export default function SafetyScreen() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex-1 flex flex-col relative z-20 w-full text-cream">
-      <header className="flex items-center gap-2 p-4 pt-6 border-b border-line">
+    <div className="flex-1 flex flex-col relative z-20 w-full text-bone min-h-0">
+      <header className="flex items-center gap-2 page-pad py-3 pt-6 border-b border-line shrink-0">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 text-mist hover:text-cream min-w-[44px] min-h-[44px]"
+          className="p-2 text-bone-dim hover:text-bone min-w-[44px] min-h-[44px]"
           aria-label="Back"
         >
           <ChevronLeft size={28} />
         </button>
-        <h1 className="text-2xl font-bold">Privacy & safety</h1>
+        <h1 className="fluid-display-sm">Privacy & safety</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-4 pb-28">
+      <div className="flex-1 overflow-y-auto page-pad py-5 space-y-4 pb-24 min-h-0">
         <p className="text-mist text-sm leading-relaxed">
           MingleKE is built for real connections. Your safety matters more than any match.
         </p>

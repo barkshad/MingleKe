@@ -28,9 +28,9 @@ export default function MatchesScreen() {
   );
 
   return (
-    <div className="flex-1 flex flex-col relative z-10 text-bone pb-14">
-      <header className="px-4 py-3 border-b border-line">
-        <h1 className="type-display text-3xl leading-none mb-3">{isMessagesView ? 'Inbox' : 'Mutual'}</h1>
+    <div className="flex-1 flex flex-col relative z-10 text-bone pb-14 min-h-0">
+      <header className="page-pad py-3 border-b border-line shrink-0">
+        <h1 className="fluid-display-sm mb-3">{isMessagesView ? 'Inbox' : 'Mutual'}</h1>
         {matches.length > 0 && (
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-dim" />
@@ -45,8 +45,8 @@ export default function MatchesScreen() {
         )}
       </header>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-3 border-b border-line">
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="page-pad py-3 border-b border-line">
           <FreeCountdown compact />
         </div>
 
@@ -55,10 +55,10 @@ export default function MatchesScreen() {
             <div className="h-8 w-8 border border-line border-t-hibiscus animate-spin" />
           </div>
         ) : error ? (
-          <div className="px-4 py-16 space-y-3">
+          <div className="page-pad py-16 space-y-3">
             <p className="type-meta text-hibiscus">Could not load</p>
             <p className="text-sm text-bone-dim">{error}</p>
-            <button onClick={() => user && subscribeToMatches(user.uid)} className="btn-secondary max-w-xs">
+            <button onClick={() => user && subscribeToMatches(user.uid)} className="btn-secondary max-w-md">
               Try again
             </button>
           </div>
@@ -68,7 +68,7 @@ export default function MatchesScreen() {
               <li key={match.id}>
                 <button
                   onClick={() => navigate(`/chat/${match.id}`)}
-                  className="w-full flex items-center gap-3 px-4 py-3 border-b border-line hover:bg-ink-soft text-left min-h-[72px]"
+                  className="w-full flex items-center gap-3 page-pad py-3 border-b border-line hover:bg-ink-soft text-left min-h-[72px]"
                 >
                   <Avatar
                     src={match.otherUser.photos?.[0]}
@@ -89,16 +89,16 @@ export default function MatchesScreen() {
             ))}
           </ul>
         ) : (
-          <div className="px-4 py-16 space-y-3">
+          <div className="page-pad py-16 space-y-3">
             <p className="type-meta">Empty</p>
-            <h2 className="type-display text-3xl leading-none">
+            <h2 className="fluid-display-sm">
               {q ? 'Nobody by that name' : 'No mutuals yet'}
             </h2>
-            <p className="text-sm text-bone-dim max-w-xs">
+            <p className="text-sm text-bone-dim max-w-md">
               {q ? 'Try another name.' : 'When both of you like, the thread shows up here.'}
             </p>
             {!q && (
-              <button onClick={() => navigate('/')} className="btn-primary max-w-xs">
+              <button onClick={() => navigate('/')} className="btn-primary max-w-md">
                 Open the deck
               </button>
             )}

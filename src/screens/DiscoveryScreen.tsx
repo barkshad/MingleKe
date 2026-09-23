@@ -197,17 +197,17 @@ export default function DiscoveryScreen() {
   }
 
   return (
-    <div className="flex-1 flex flex-col relative z-10 pb-14">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-line">
-        <div>
-          <h1 className="type-display text-2xl leading-none">Deck</h1>
-          <p className="type-meta mt-1">
+    <div className="flex-1 flex flex-col relative z-10 pb-14 min-h-0">
+      <header className="flex items-center justify-between page-pad py-3 border-b border-line shrink-0">
+        <div className="min-w-0">
+          <h1 className="fluid-display-sm leading-none">Deck</h1>
+          <p className="type-meta mt-1 truncate">
             {Math.max(profiles.length - currentIndex, 0)} left · {minAge}–{maxAge}
           </p>
         </div>
         <button
           onClick={() => setShowFilters(true)}
-          className="type-meta border border-line px-3 py-2 hover:border-bone-dim min-h-[44px]"
+          className="type-meta border border-line px-3 py-2 hover:border-bone-dim min-h-[44px] shrink-0"
           aria-label="Filters"
         >
           <Filter size={14} className="inline mr-1" />
@@ -216,12 +216,12 @@ export default function DiscoveryScreen() {
       </header>
 
       {isFreeWindow() && (
-        <div className="px-4 py-2 border-b border-line">
+        <div className="page-pad py-2 border-b border-line shrink-0">
           <FreeCountdown compact />
         </div>
       )}
 
-      <div className="flex-1 relative p-3">
+      <div className="flex-1 relative min-h-0 p-2 sm:p-3">
         <AnimatePresence>
           {currentProfile ? (
             <motion.div
@@ -236,7 +236,7 @@ export default function DiscoveryScreen() {
                 else if (info.offset.x < -100) handleSwipe('left');
                 else x.set(0);
               }}
-              className="absolute inset-3 cursor-grab active:cursor-grabbing"
+              className="absolute inset-2 sm:inset-3 cursor-grab active:cursor-grabbing"
             >
               <div className="w-full h-full plate relative select-none">
                 <img
@@ -275,21 +275,21 @@ export default function DiscoveryScreen() {
                 />
 
                 {/* nameplate signature */}
-                <div className="absolute inset-x-3 bottom-3 z-30">
+                <div className="absolute inset-x-2 sm:inset-x-3 bottom-2 sm:bottom-3 z-30">
                   <div className="flex items-end justify-between gap-2 mb-1.5">
-                    <div className="min-w-0">
-                      <h2 className="nameplate text-[28px] max-w-full truncate">
+                    <div className="min-w-0 flex-1">
+                      <h2 className="nameplate text-lg sm:text-2xl md:text-[28px] max-w-full truncate">
                         {currentProfile.name}
                         {currentProfile.age ? `, ${currentProfile.age}` : ''}
                       </h2>
-                      <p className="type-meta mt-1">
+                      <p className="type-meta mt-1 truncate">
                         {currentProfile.location?.city || 'Nearby'}
                         {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
                       </p>
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleReport(currentProfile.uid); }}
-                      className="type-meta border border-line bg-ink/80 px-2 py-2 hover:text-hibiscus hover:border-hibiscus min-h-[40px]"
+                      className="type-meta border border-line bg-ink/80 px-2 py-2 hover:text-hibiscus hover:border-hibiscus min-h-[40px] shrink-0"
                       aria-label="Report"
                     >
                       <Flag size={14} />
@@ -301,7 +301,7 @@ export default function DiscoveryScreen() {
                   {currentProfile.interests?.length ? (
                     <div className="flex flex-wrap gap-1">
                       {currentProfile.interests.slice(0, 3).map((tag) => (
-                        <span key={tag} className="type-meta border border-line bg-ink/85 px-1.5 py-0.5">
+                        <span key={tag} className="type-meta border border-line bg-ink/85 px-1.5 py-0.5 truncate max-w-[7rem]">
                           {tag}
                         </span>
                       ))}
@@ -311,7 +311,7 @@ export default function DiscoveryScreen() {
               </div>
             </motion.div>
           ) : (
-            <div className="absolute inset-3 flex flex-col justify-center px-4 gap-4">
+            <div className="absolute inset-2 sm:inset-3 flex flex-col justify-center page-pad gap-4">
               <p className="type-meta">Deck empty</p>
               <h3 className="type-display text-4xl leading-none">
                 {error ? 'Signal lost' : 'That is everyone'}
@@ -327,11 +327,11 @@ export default function DiscoveryScreen() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute bottom-14 inset-x-0 px-4 flex items-center justify-between z-40">
+      <div className="absolute bottom-14 sm:bottom-16 inset-x-0 px-3 sm:px-4 flex items-center justify-between gap-3 z-40">
         <button
           onClick={() => handleSwipe('left')}
           disabled={swiping || !currentProfile}
-          className="type-display h-14 px-6 border border-line bg-ink text-bone hover:border-hibiscus hover:text-hibiscus disabled:opacity-40 min-w-[88px]"
+          className="type-display h-12 sm:h-14 px-4 sm:px-6 border border-line bg-ink text-bone hover:border-hibiscus hover:text-hibiscus disabled:opacity-40 min-w-[72px] sm:min-w-[88px]"
           aria-label="Pass"
         >
           Pass
@@ -339,7 +339,7 @@ export default function DiscoveryScreen() {
         <button
           onClick={() => handleSwipe('right')}
           disabled={swiping || !currentProfile}
-          className="btn-primary h-14 min-w-[112px] !w-auto px-6"
+          className="btn-primary h-12 sm:h-14 min-w-[100px] sm:min-w-[112px] !w-auto px-5 sm:px-6"
           aria-label="Like"
         >
           Like
@@ -366,12 +366,12 @@ export default function DiscoveryScreen() {
               className="relative z-10 p-6 space-y-4"
             >
               <p className="type-meta">Mutual</p>
-              <h2 className="type-display text-5xl leading-none">
+              <h2 className="type-display text-4xl leading-none">
                 You matched
                 <br />
-                <span className="text-hibiscus">{matchFound.name}</span>
+                <span className="text-hibiscus break-words">{matchFound.name}</span>
               </h2>
-              <div className="flex gap-2 max-w-sm">
+              <div className="flex flex-col sm:flex-row gap-2 max-w-md">
                 <button
                   onClick={() => {
                     const id = matchId;
@@ -403,7 +403,7 @@ export default function DiscoveryScreen() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[85] bg-ink/90 flex items-end sm:items-center justify-center p-4"
           >
-            <motion.div initial={{ y: 16 }} animate={{ y: 0 }} className="panel w-full max-w-sm p-5 space-y-5">
+            <motion.div initial={{ y: 16 }} animate={{ y: 0 }} className="panel w-full max-w-md p-5 space-y-5">
               <div className="flex items-start justify-between">
                 <h3 className="type-display text-2xl">Filter</h3>
                 <button onClick={() => setShowFilters(false)} className="type-meta" aria-label="Close">

@@ -48,12 +48,12 @@ export default function LandingScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-ink text-bone">
-      <div className="px-5 pt-10 pb-6 border-b border-line">
+    <div className="flex-1 flex flex-col bg-ink text-bone min-h-0">
+      <div className="page-pad pt-8 sm:pt-10 pb-5 border-b border-line">
         <Link to="/home" className="type-meta hover:text-bone">
           ← MingleKE
         </Link>
-        <h1 className="type-display text-[42px] mt-4 mb-2">
+        <h1 className="fluid-display mt-4 mb-2">
           {view === 'reset'
             ? 'Reset'
             : view === 'email-login'
@@ -73,8 +73,8 @@ export default function LandingScreen() {
         </p>
       </div>
 
-      <div className="flex-1 px-5 py-6">
-        <div className="mb-5 max-w-sm">
+      <div className="flex-1 page-pad py-6 overflow-y-auto min-h-0">
+        <div className="mb-5 max-w-md">
           <FreeCountdown compact />
         </div>
 
@@ -85,7 +85,7 @@ export default function LandingScreen() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="space-y-2 max-w-sm"
+              className="space-y-2 max-w-md"
             >
               <button type="button" onClick={handleInspect} className="btn-primary">
                 Log in
@@ -106,7 +106,7 @@ export default function LandingScreen() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               onSubmit={view === 'reset' ? handleReset : handleEmailAuth}
-              className="space-y-4 max-w-sm"
+              className="space-y-4 max-w-md"
             >
               <div className="relative">
                 <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-dim" />
@@ -179,7 +179,7 @@ export default function LandingScreen() {
         </AnimatePresence>
       </div>
 
-      <p className="type-meta px-5 pb-8">
+      <p className="type-meta page-pad pb-8">
         By continuing you accept the community rules under{' '}
         <Link to="/profile/safety" className="text-bone underline">
           Safety

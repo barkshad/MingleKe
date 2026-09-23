@@ -48,7 +48,7 @@ export function PwaPrompt() {
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 40, opacity: 0 }}
-          className="fixed bottom-28 inset-x-4 z-[70] pointer-events-auto max-w-sm mx-auto"
+          className="fixed bottom-20 sm:bottom-24 inset-x-3 sm:inset-x-4 z-[70] pointer-events-auto max-w-md mx-auto"
         >
           <div className="panel p-4 flex items-center gap-3 shadow-none">
             <div className="w-10 h-10 border border-hibiscus text-hibiscus flex items-center justify-center shrink-0">

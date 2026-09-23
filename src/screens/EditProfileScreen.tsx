@@ -65,19 +65,19 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col relative z-20 w-full text-cream">
-      <header className="flex items-center gap-2 p-4 pt-6 border-b border-line">
+    <div className="flex-1 flex flex-col relative z-20 w-full text-bone min-h-0">
+      <header className="flex items-center gap-2 page-pad py-3 pt-6 border-b border-line shrink-0">
         <button
           onClick={() => navigate('/profile')}
-          className="p-2 text-mist hover:text-cream min-w-[44px] min-h-[44px]"
+          className="p-2 text-bone-dim hover:text-bone min-w-[44px] min-h-[44px]"
           aria-label="Back"
         >
           <ChevronLeft size={28} />
         </button>
-        <h1 className="text-2xl font-bold">Edit profile</h1>
+        <h1 className="fluid-display-sm">Edit profile</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-6 pb-28">
+      <div className="flex-1 overflow-y-auto page-pad py-5 space-y-6 pb-24 min-h-0">
         <section className="space-y-3">
           <h2 className="text-sm font-bold text-mist uppercase tracking-wider">Photos</h2>
           <div className="grid grid-cols-3 gap-3">

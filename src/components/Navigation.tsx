@@ -13,7 +13,7 @@ export default function Navigation() {
 
   return (
     <div className="absolute bottom-0 inset-x-0 z-50 pointer-events-none">
-      <nav className="pointer-events-auto bg-ink border-t border-line grid grid-cols-4">
+      <nav className="pointer-events-auto bg-ink border-t border-line grid grid-cols-4 pb-[env(safe-area-inset-bottom,0px)]">
         {navItems.map((item) => (
           <NavLink
             key={item.path}

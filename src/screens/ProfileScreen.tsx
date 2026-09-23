@@ -51,28 +51,28 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <div className="flex-1 flex flex-col relative z-10 text-bone pb-14">
-      <div className="flex-1 overflow-y-auto">
-        <div className="relative h-56 border-b border-line">
+    <div className="flex-1 flex flex-col relative z-10 text-bone pb-14 min-h-0">
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="relative h-48 sm:h-56 border-b border-line">
           <Avatar
             src={profile?.photos?.[0]}
             alt="You"
             className="absolute inset-0 w-full h-full object-cover object-top"
           />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #14110E 10%, transparent 55%)' }} />
-          <div className="absolute left-4 right-4 bottom-3 flex items-end justify-between gap-3">
-            <div>
-              <h1 className="nameplate text-3xl">
+          <div className="absolute left-3 right-3 sm:left-4 sm:right-4 bottom-3 flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="nameplate text-xl sm:text-3xl max-w-full truncate">
                 {profile?.name || 'You'}
                 {profile?.age ? `, ${profile.age}` : ''}
               </h1>
-              <p className="type-meta mt-1">
+              <p className="type-meta mt-1 truncate">
                 {(profile?.gender || '').toString()} · likes {(profile?.interestedIn || '').toString()}
               </p>
             </div>
             <Link
               to="/profile/edit"
-              className="type-meta border border-line bg-ink px-3 py-2 hover:border-bone min-h-[44px] inline-flex items-center"
+              className="type-meta border border-line bg-ink px-3 py-2 hover:border-bone min-h-[44px] inline-flex items-center shrink-0"
             >
               <Edit3 size={14} className="mr-1" />
               Edit
@@ -81,21 +81,21 @@ export default function ProfileScreen() {
         </div>
 
         {profile?.bio && (
-          <p className="px-4 py-4 text-sm text-bone-dim leading-relaxed border-b border-line">{profile.bio}</p>
+          <p className="page-pad py-4 text-sm text-bone-dim leading-relaxed border-b border-line">{profile.bio}</p>
         )}
 
         <div className="grid grid-cols-2 border-b border-line">
-          <div className="px-4 py-4 border-r border-line">
+          <div className="page-pad py-4 border-r border-line">
             <p className="font-mono text-2xl text-hibiscus tabular-nums">{matchCount}</p>
             <p className="type-meta mt-1">Mutual</p>
           </div>
-          <div className="px-4 py-4">
+          <div className="page-pad py-4">
             <p className="font-mono text-2xl tabular-nums">{profile?.photos?.length || 0}/3</p>
             <p className="type-meta mt-1">Photos</p>
           </div>
         </div>
 
-        <div className="px-4 py-5 max-w-md">
+        <div className="page-pad py-5 max-w-md">
           <FreeCountdown compact className="mb-4" />
 
           <nav className="border border-line divide-y divide-line rounded-md overflow-hidden mb-4">
