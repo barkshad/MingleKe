@@ -1,97 +1,161 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { Settings, LogOut, Shield, Heart, Bell, MessageSquare, ChevronRight, Edit3 } from 'lucide-react';
-import { auth } from '../firebase';
+import React, { useEffect, useState } from 'react';
+import {
+  LogOut,
+  Shield,
+  Heart,
+  Settings,
+  ChevronRight,
+  Edit3,
+  Sparkles,
+} from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
+import { Avatar } from '../components/Avatar';
+import { useToast } from '../components/Toast';
 
 export default function ProfileScreen() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast((s) => s.show);
+  const [matchCount, setMatchCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      try {
+        const snap = await getDocs(
+          query(collection(db, 'matches'), where('users', 'array-contains', user.uid))
+        );
+        setMatchCount(snap.size);
+      } catch {
+        setMatchCount(0);
+      }
+    };
+    load();
+  }, [user]);
 
   const handleLogout = async () => {
-    await auth.signOut();
-    navigate('/welcome');
+    try {
+      await signOut(auth);
+      navigate('/welcome');
+    } catch {
+      toast('Could not log out. Try again.', 'error');
+    }
   };
 
   const sections = [
-    { icon: Edit3, label: 'Edit Profile', color: 'text-gray-400', bg: 'bg-white/10' },
-    { icon: Heart, label: 'Preferences', color: 'text-gray-400', bg: 'bg-white/10' },
-    { icon: Bell, label: 'Notifications', color: 'text-teal-400', bg: 'bg-teal-500/20' },
-    { icon: Shield, label: 'Privacy & Safety', color: 'text-green-400', bg: 'bg-green-500/20' },
+    {
+      icon: Edit3,
+      label: 'Edit profile',
+      to: '/profile/edit',
+      color: 'text-rose',
+      bg: 'bg-rose/15',
+    },
+    {
+      icon: Settings,
+      label: 'Preferences',
+      to: '/profile/preferences',
+      color: 'text-amber',
+      bg: 'bg-amber/15',
+    },
+    {
+      icon: Shield,
+      label: 'Privacy & safety',
+      to: '/profile/safety',
+      color: 'text-sage',
+      bg: 'bg-sage/15',
+    },
   ];
 
   return (
-    <div className="flex-1 flex flex-col relative z-20 w-full text-white">
-      <div className="flex-1 overflow-y-auto pb-24">
-        <header className="glass-panel px-6 pt-16 pb-8 rounded-b-[40px] flex flex-col items-center relative overflow-hidden border-t-0 ">
-          {/* Ambient Glows */}
-          <div className="absolute top-0 -left-10 w-40 h-40 bg-white/10 rounded-full blur-[40px] pointer-events-none" />
-          <div className="absolute top-0 -right-10 w-40 h-40 bg-white/10 rounded-full blur-[40px] pointer-events-none" />
-          
-          <div className="relative group z-10">
-            <div className="w-36 h-36 rounded-full p-1  relative">
-              <img 
-                src={profile?.photos[0] || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=800&auto=format&fit=crop&q=60'} 
-                alt="Profile" 
-                className="w-full h-full rounded-full object-cover border-4 border-[#170e1b]"
-              />
-            </div>
-            <button className="absolute bottom-1 right-1 bg-white text-white p-2.5 rounded-full  active:scale-95 transition-transform ">
-              <Edit3 size={18} strokeWidth={3} />
-            </button>
+    <div className="flex-1 flex flex-col relative z-20 w-full text-cream">
+      <div className="flex-1 overflow-y-auto pb-28">
+        <header className="glass-panel px-6 pt-14 pb-8 rounded-b-[36px] flex flex-col items-center relative overflow-hidden border-t-0">
+          <div className="absolute top-0 -left-10 w-36 h-36 bg-rose/15 rounded-full blur-[40px] pointer-events-none" />
+          <div className="absolute top-0 -right-10 w-36 h-36 bg-[#ff8a5b]/10 rounded-full blur-[40px] pointer-events-none" />
+
+          <div className="relative z-10">
+            <Avatar
+              src={profile?.photos?.[0]}
+              alt="You"
+              className="w-32 h-32 rounded-full border-4 border-ink object-cover"
+            />
+            <Link
+              to="/profile/edit"
+              className="absolute bottom-0 right-0 bg-rose text-white p-2.5 rounded-full active:scale-95 transition-transform"
+              aria-label="Edit profile photo"
+            >
+              <Edit3 size={16} strokeWidth={3} />
+            </Link>
           </div>
-          
-          <h1 className="mt-6 text-3xl font-bold text-white  tracking-tight">{profile?.name}, {profile?.age}</h1>
-          <p className="text-white/60 text-sm font-medium mt-1 uppercase tracking-widest">{profile?.gender} • {profile?.interestedIn}</p>
-          
-          <div className="mt-8 flex gap-4 w-full px-2">
-            <div className="flex-1 glass-panel border border-white/10 p-4 rounded-[24px] text-center ">
-              <p className="text-gray-400 font-bold text-2xl ">14</p>
-              <p className="text-[9px] uppercase font-bold text-white/50 tracking-widest mt-1">Total Matches</p>
+
+          <h1 className="mt-5 text-3xl font-bold tracking-tight">
+            {profile?.name || 'You'}
+            {profile?.age ? `, ${profile.age}` : ''}
+          </h1>
+          <p className="text-mist text-sm font-medium mt-1 uppercase tracking-widest">
+            {(profile?.gender || '').toString()} · likes {(profile?.interestedIn || '').toString()}
+          </p>
+          {profile?.bio && (
+            <p className="text-cream/80 text-sm mt-3 max-w-[280px] text-center leading-relaxed">{profile.bio}</p>
+          )}
+
+          <div className="mt-6 flex gap-3 w-full px-1">
+            <div className="flex-1 glass-panel border border-line p-4 rounded-3xl text-center">
+              <p className="text-rose font-bold text-2xl">{matchCount}</p>
+              <p className="text-[10px] uppercase font-bold text-mist tracking-widest mt-1">Matches</p>
             </div>
-            <div className="flex-1 glass-panel border border-white/10 p-4 rounded-[24px] text-center ">
-              <p className="text-gray-400 font-bold text-2xl ">42</p>
-              <p className="text-[9px] uppercase font-bold text-white/50 tracking-widest mt-1">Profile Views</p>
+            <div className="flex-1 glass-panel border border-line p-4 rounded-3xl text-center">
+              <p className="text-cream font-bold text-2xl">{profile?.photos?.length || 0}/3</p>
+              <p className="text-[10px] uppercase font-bold text-mist tracking-widest mt-1">Photos</p>
             </div>
           </div>
         </header>
 
-        <div className="px-5 py-8 space-y-4">
-          <div className="glass-panel rounded-[32px] p-2 border border-white/10 relative overflow-hidden">
-             <div className="absolute top-1/2 left-0 w-full h-px from-transparent via-white/10 to-transparent pointer-events-none" />
-             <div className="absolute top-1/4 left-0 w-full h-px from-transparent via-white/10 to-transparent pointer-events-none" />
-             <div className="absolute top-3/4 left-0 w-full h-px from-transparent via-white/10 to-transparent pointer-events-none" />
-
-            {sections.map((item, idx) => (
-              <button 
-                key={idx}
-                className="w-full flex items-center gap-4 p-4 hover:bg-white/5 transition-colors rounded-[24px] group relative z-10"
+        <div className="px-5 py-7 space-y-3">
+          <div className="glass-panel rounded-[28px] p-2 border border-line">
+            {sections.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="w-full flex items-center gap-3 p-3.5 hover:bg-white/5 transition-colors rounded-3xl group min-h-[56px]"
               >
-                <div className={`w-12 h-12 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center `}>
-                  <item.icon size={22} strokeWidth={2.5} />
+                <div className={`w-11 h-11 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center shrink-0`}>
+                  <item.icon size={20} strokeWidth={2.5} />
                 </div>
-                <span className="flex-1 text-left font-bold text-white text-lg ">{item.label}</span>
-                <ChevronRight size={20} className="text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
-              </button>
+                <span className="flex-1 text-left font-bold text-cream text-base">{item.label}</span>
+                <ChevronRight size={18} className="text-mist/50 group-hover:text-cream group-hover:translate-x-0.5 transition-all" />
+              </Link>
             ))}
           </div>
 
-          <div className="glass-panel rounded-[32px] p-2 border border-red-500/20 ">
-            <button 
+          {profile?.paymentStatus === 'completed' && (
+            <div className="glass-panel rounded-[28px] p-4 border border-sage/30 flex items-center gap-3">
+              <Sparkles size={20} className="text-sage shrink-0" />
+              <p className="text-sm text-mist">
+                <span className="text-sage font-bold">Verified</span> member. Thanks for helping keep MingleKE genuine.
+              </p>
+            </div>
+          )}
+
+          <div className="glass-panel rounded-[28px] p-2 border border-rose/20">
+            <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-4 p-4 text-red-400 hover:bg-red-500/10 transition-colors rounded-[24px]"
+              className="w-full flex items-center gap-3 p-3.5 text-rose hover:bg-rose/10 transition-colors rounded-3xl min-h-[56px]"
             >
-              <div className="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center">
-                <LogOut size={22} strokeWidth={2.5} />
+              <div className="w-11 h-11 bg-rose/15 rounded-2xl flex items-center justify-center shrink-0">
+                <LogOut size={20} strokeWidth={2.5} />
               </div>
-              <span className="flex-1 text-left font-bold text-lg">Log Out</span>
+              <span className="flex-1 text-left font-bold text-base">Log out</span>
             </button>
           </div>
 
-          <p className="text-center text-[10px] text-white/30 uppercase tracking-widest pt-6 font-bold">
-            MingleKE Version 2.0.0
+          <p className="text-center text-[11px] text-mist/60 pt-4 font-medium">
+            MingleKE 2.1 · Made for Kenya
           </p>
         </div>
       </div>

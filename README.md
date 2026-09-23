@@ -1,20 +1,60 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# MingleKE
 
-# Run and deploy your AI Studio app
+Mobile-first dating and social discovery for Kenya. Swipe, match, and chat with people nearby.
 
-This contains everything you need to run your app locally.
+## What you get
 
-View your app in AI Studio: https://ai.studio/apps/6be03dc4-d4bf-4d0f-b4bd-3b54439d3b97
+- Email sign-up, login, and password reset
+- Guided onboarding (gender, preferences, age 18+, city or GPS, 3 photos, bio, interests)
+- Optional M-Pesa KES 100 verification for women (simulated when Lipana is not configured)
+- Swipe discovery with age filters, pass/like actions, and mutual-match modal
+- Matches list with search
+- Real-time chat
+- Edit profile, preferences, and safety guidelines
+- Installable PWA (Add to Home Screen / desktop install)
 
-## Run Locally
+## Run locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js 20+
 
+```bash
+npm install
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Open http://localhost:3000
+
+### Optional environment (`.env`)
+
+| Key | Purpose |
+| --- | --- |
+| `VITE_CLOUDINARY_CLOUD_NAME` / `VITE_CLOUDINARY_UPLOAD_PRESET` | Photo uploads via Cloudinary |
+| `LIPANA_API_KEY` / `LIPANA_PAYMENT_LINK_SLUG` | Real M-Pesa STK push |
+| `PORT` | Server port (default 3000) |
+
+Without Cloudinary, photos go to Firebase Storage. Without Lipana, payments auto-confirm in demo mode.
+
+## Build & run production
+
+```bash
+npm run build
+npm start
+```
+
+## Stack
+
+React 19 · Vite 6 · Tailwind 4 · Firebase Auth + Firestore + Storage · Motion · Express · Zustand
+
+## Deploy (Vercel)
+
+This repo is a Vite SPA with a small Express API. Vercel can use:
+
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Install command:** `npm install`
+
+If you only need the static client on Vercel (no M-Pesa API), point output at `dist` after `vite build`. For API routes, deploy the Node server (`dist/server.cjs`) or split payments into a separate function.
+
+## Safety
+
+Members must be 18+. Reports are stored for review. Never send money to matches. Full tips live in-app under **Privacy & safety**.

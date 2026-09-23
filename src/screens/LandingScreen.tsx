@@ -1,180 +1,212 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Heart, Mail, Phone, ArrowRight } from 'lucide-react';
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { Heart, Mail, ArrowRight, ArrowLeft, KeyRound } from 'lucide-react';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
 import { auth } from '../firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { friendlyAuthError } from '../lib/utils';
+import { useToast } from '../components/Toast';
+
+type View = 'welcome' | 'email-login' | 'email-signup' | 'reset';
 
 export default function LandingScreen() {
-  const [view, setView] = useState<'welcome' | 'email-login' | 'email-signup'>('welcome');
+  const [view, setView] = useState<View>('welcome');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast((s) => s.show);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setBusy(true);
     try {
       if (view === 'email-login') {
         await signInWithEmailAndPassword(auth, email, password);
-      } else {
+        navigate('/');
+      } else if (view === 'email-signup') {
         await createUserWithEmailAndPassword(auth, email, password);
+        navigate('/onboarding');
       }
-      navigate('/onboarding');
     } catch (err: any) {
-      setError(err.message);
+      setError(friendlyAuthError(err?.code || err?.message || 'Could not continue'));
+    } finally {
+      setBusy(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setBusy(true);
     try {
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      navigate('/onboarding');
+      await sendPasswordResetEmail(auth, email);
+      toast('Reset link sent. Check your inbox.', 'success');
+      setView('email-login');
     } catch (err: any) {
-      if (err.code === 'auth/unauthorized-domain') {
-        setError('This domain is not authorized for Google Sign-In. Please add your Vercel domain to the "Authorized domains" list in Firebase Console (Authentication > Settings > Authorized domains).');
-      } else {
-        setError(err.message);
-      }
+      setError(friendlyAuthError(err?.code || err?.message || 'Could not send reset email'));
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col p-8 text-white relative z-10 w-full">
+    <div className="flex-1 flex flex-col p-8 text-cream relative z-10 w-full">
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         <motion.div
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="w-32 h-32 rounded-3xl mb-8 flex items-center justify-center "
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          className="w-24 h-24 rounded-[28px] mb-8 flex items-center justify-center bg-rose/15 border border-rose/30"
         >
-          <Heart size={64} fill="white" className="text-white " />
+          <Heart size={48} fill="#FF4D6D" className="text-rose" />
         </motion.div>
-        
+
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-6xl font-bold mb-3 tracking-tighter"
+          className="text-5xl font-bold mb-3 tracking-tight"
         >
           MingleKE
         </motion.h1>
-        
+
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-xl text-white/70 max-w-[280px] font-medium"
+          transition={{ delay: 0.08 }}
+          className="text-lg text-mist max-w-[280px] font-medium"
         >
-          Discover meaningful connections in Kenya.
+          Meet people nearby. Keep it real.
         </motion.p>
       </div>
 
-      <div className="space-y-4 mb-8 w-full max-w-sm mx-auto">
+      <div className="space-y-4 mb-6 w-full max-w-sm mx-auto">
         <AnimatePresence mode="wait">
-          {view === 'welcome' ? (
+          {view === 'welcome' && (
             <motion.div
               key="welcome"
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-4"
+              exit={{ opacity: 0, x: -16 }}
+              className="space-y-3"
             >
-              <button
-                onClick={() => setView('email-signup')}
-                className="btn-primary"
-              >
-                Create Account
+              <button onClick={() => setView('email-signup')} className="btn-primary">
+                Create account
               </button>
-              <button
-                onClick={() => setView('email-login')}
-                className="btn-secondary"
-              >
-                Log In
-              </button>
-              
-              <div className="flex items-center gap-4 my-6 opacity-60">
-                <div className="h-[1px] flex-1 bg-white/30" />
-                <span className="text-xs uppercase tracking-widest font-bold">or continue with</span>
-                <div className="h-[1px] flex-1 bg-white/30" />
-              </div>
-
-              {error && (
-                <p className="text-white text-xs bg-red-500/30 p-3 rounded-lg border border-red-500/50">
-                  {error}
-                </p>
-              )}
-
-              <button
-                onClick={handleGoogleLogin}
-                className="w-full glass-panel text-white font-bold py-4 rounded-full flex items-center justify-center gap-3  active:scale-[0.98] transition-all"
-              >
-                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 bg-white p-0.5 rounded-full" />
-                Sign in with Google
+              <button onClick={() => setView('email-login')} className="btn-secondary">
+                Log in
               </button>
             </motion.div>
-          ) : (
+          )}
+
+          {(view === 'email-login' || view === 'email-signup' || view === 'reset') && (
             <motion.form
-              key="form"
-              initial={{ opacity: 0, x: 20 }}
+              key={view}
+              initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              onSubmit={handleEmailAuth}
-              className="glass-panel p-6 rounded-[32px] space-y-6  relative overflow-hidden"
+              exit={{ opacity: 0, x: -16 }}
+              onSubmit={view === 'reset' ? handleReset : handleEmailAuth}
+              className="glass-panel p-6 rounded-[28px] space-y-5 relative overflow-hidden"
             >
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold">{view === 'email-login' ? 'Welcome Back' : 'Get Started'}</h2>
-                <p className="text-white/70 text-sm">{view === 'email-login' ? 'Log in to find your match' : 'Join our genuine community'}</p>
+              <div className="space-y-1">
+                <h2 className="text-2xl font-bold">
+                  {view === 'email-login' ? 'Welcome back' : view === 'email-signup' ? 'Get started' : 'Reset password'}
+                </h2>
+                <p className="text-mist text-sm">
+                  {view === 'email-login'
+                    ? 'Log in and keep swiping.'
+                    : view === 'email-signup'
+                      ? 'Create your account to start matching.'
+                      : 'We will email you a reset link.'}
+                </p>
               </div>
 
               <div className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white placeholder:text-white/50 focus:outline-hidden focus:ring-2 focus:ring-white/40 transition-all"
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white placeholder:text-white/50 focus:outline-hidden focus:ring-2 focus:ring-white/40 transition-all"
-                  required
-                />
+                <div className="relative">
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-mist" />
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input-field pl-11"
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+                {view !== 'reset' && (
+                  <div className="relative">
+                    <KeyRound size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-mist" />
+                    <input
+                      type="password"
+                      placeholder="Password (min 6 characters)"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="input-field pl-11"
+                      required
+                      minLength={6}
+                      autoComplete={view === 'email-login' ? 'current-password' : 'new-password'}
+                    />
+                  </div>
+                )}
               </div>
 
               {error && (
-                <p className="text-white text-xs bg-red-500/30 p-3 rounded-lg border border-red-500/50">
+                <p className="text-rose text-sm bg-rose/10 p-3 rounded-xl border border-rose/30" role="alert">
                   {error}
                 </p>
               )}
 
-              <button
-                type="submit"
-                className="w-full bg-white text-white font-bold py-4 rounded-2xl  active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
-                {view === 'email-login' ? 'Log In' : 'Sign Up'}
-                <ArrowRight size={20} />
+              <button type="submit" disabled={busy} className="btn-primary flex items-center justify-center gap-2">
+                {busy ? (
+                  <span className="inline-block h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                ) : (
+                  <>
+                    {view === 'email-login' ? 'Log in' : view === 'email-signup' ? 'Create account' : 'Send reset link'}
+                    <ArrowRight size={18} />
+                  </>
+                )}
               </button>
 
-              <button
-                type="button"
-                onClick={() => setView('welcome')}
-                className="w-full text-white/70 text-sm font-medium pt-2"
-              >
-                Go Back
-              </button>
+              <div className="flex items-center justify-between text-sm">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError('');
+                    setView('welcome');
+                  }}
+                  className="text-mist hover:text-cream inline-flex items-center gap-1"
+                >
+                  <ArrowLeft size={16} /> Back
+                </button>
+                {view === 'email-login' && (
+                  <button type="button" onClick={() => setView('reset')} className="text-rose font-medium">
+                    Forgot password?
+                  </button>
+                )}
+                {view === 'email-signup' && (
+                  <button type="button" onClick={() => setView('email-login')} className="text-rose font-medium">
+                    Have an account?
+                  </button>
+                )}
+              </div>
             </motion.form>
           )}
         </AnimatePresence>
       </div>
 
-      <p className="text-[10px] text-center opacity-60 px-4">
-        By continuing, you agree to our Terms of Service & Privacy Policy.
+      <p className="text-[11px] text-center text-mist px-4 leading-relaxed">
+        By continuing you agree to our{' '}
+        <Link to="/profile/safety" className="underline underline-offset-2 hover:text-cream">
+          community guidelines
+        </Link>
+        . Members must be 18 or older.
       </p>
     </div>
   );

@@ -1,3 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#bf61ff" stroke="#bf61ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16101c"/>
+      <stop offset="100%" stop-color="#0b0710"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="none" stroke="#2a2233" stroke-width="8"/>
+  <path d="M256 388c-8 0-15-3-20-8l-92-88c-40-38-42-102-6-140 34-36 90-38 126-6 36-32 92-30 126 6 36 38 34 102-6 140l-92 88c-5 5-12 8-20 8z" fill="#FF4D6D"/>
 </svg>
