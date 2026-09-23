@@ -148,7 +148,7 @@ export function ShiftingPhotoWall() {
             {[...railTop, ...railTop].map((p, i) => (
               <img
                 key={`t-${p.uid}-${i}`}
-                src={p.photos?.[0]}
+                src={p.photos?.[0]?.replace('/seed/wa/', '/seed/thumbs/')}
                 alt=""
                 className="h-10 w-8 sm:h-12 sm:w-9 object-cover object-top border border-line/80 shrink-0 grayscale hover:grayscale-0 transition"
                 draggable={false}
@@ -160,7 +160,7 @@ export function ShiftingPhotoWall() {
             {[...railBottom, ...railBottom].map((p, i) => (
               <img
                 key={`b-${p.uid}-${i}`}
-                src={p.photos?.[0]}
+                src={p.photos?.[0]?.replace('/seed/wa/', '/seed/thumbs/')}
                 alt=""
                 className="h-10 w-8 sm:h-12 sm:w-9 object-cover object-top border border-line/80 shrink-0 grayscale hover:grayscale-0 transition"
                 draggable={false}

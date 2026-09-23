@@ -17,6 +17,8 @@ import Navigation from '../components/Navigation';
 import { cn, PLACEHOLDER_AVATAR } from '../lib/utils';
 import { fetchDiscoveryProfiles, getSwipedUids, type MatchUser } from '../store';
 import { filterSeeds } from '../lib/seedProfiles';
+import { ensureDemoThread, rememberLocalSwipe, demoMatchId, isDemoThreadId } from '../lib/demoChat';
+import { withTimeout } from '../lib/network';
 import { useToast } from '../components/Toast';
 import { FreeCountdown } from '../components/FreeCountdown';
 import { isFreeWindow } from '../lib/promo';
@@ -140,29 +142,39 @@ export default function DiscoveryScreen() {
     };
 
     try {
-      remember(swipedUser.uid);
+      remember(user.uid);
 
       if (isSeedUid(swipedUser.uid)) {
-        if (direction === 'right' && Math.random() < 0.4) {
+        if (direction === 'right') {
+          // Always open an inbox for demo plates so chat is inspectable
+          ensureDemoThread(swipedUser.uid, user.uid);
           setMatchFound(swipedUser);
-          setMatchId(`demo-${swipedUser.uid}`);
+          setMatchId(demoMatchId(swipedUser.uid, user.uid));
         }
       } else {
-        await addDoc(collection(db, 'likes'), {
-          senderId: user.uid,
-          receiverId: swipedUser.uid,
-          action: direction === 'right' ? 'like' : 'pass',
-          createdAt: serverTimestamp(),
-        });
+        await withTimeout(
+          addDoc(collection(db, 'likes'), {
+            senderId: user.uid,
+            receiverId: swipedUser.uid,
+            action: direction === 'right' ? 'like' : 'pass',
+            createdAt: serverTimestamp(),
+          }),
+          6000,
+          'Swipe'
+        );
 
         if (direction === 'right') {
-          const mutual = await getDocs(
-            query(
-              collection(db, 'likes'),
-              where('senderId', '==', swipedUser.uid),
-              where('receiverId', '==', user.uid),
-              where('action', '==', 'like')
-            )
+          const mutual = await withTimeout(
+            getDocs(
+              query(
+                collection(db, 'likes'),
+                where('senderId', '==', swipedUser.uid),
+                where('receiverId', '==', user.uid),
+                where('action', '==', 'like')
+              )
+            ),
+            5000,
+            'Match check'
           );
           if (!mutual.empty) {
             const newMatchId = [user.uid, swipedUser.uid].sort().join('_');
@@ -177,7 +189,14 @@ export default function DiscoveryScreen() {
         }
       }
     } catch {
-      toast('Swipe not saved.', 'error');
+      // Low network: still move the deck forward; seed likes already stored locally
+      if (isSeedUid(swipedUser.uid) && direction === 'right') {
+        ensureDemoThread(swipedUser.uid, user.uid);
+        setMatchFound(swipedUser);
+        setMatchId(demoMatchId(swipedUser.uid, user.uid));
+      } else {
+        toast('Saved locally. Syncs when the network returns.', 'info');
+      }
     } finally {
       setTimeout(() => {
         setCurrentIndex((i) => i + 1);
@@ -243,6 +262,8 @@ export default function DiscoveryScreen() {
                   src={photos[activePhotoIndex] || PLACEHOLDER_AVATAR}
                   alt={currentProfile.name}
                   draggable={false}
+                  loading="eager"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover object-top bg-ink-soft"
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_AVATAR;
@@ -376,8 +397,8 @@ export default function DiscoveryScreen() {
                   onClick={() => {
                     const id = matchId;
                     setMatchFound(null);
-                    if (id && id.startsWith('demo-')) {
-                      toast('Demo match. Live chat unlocks with real members.', 'info');
+                    if (id && isDemoThreadId(id)) {
+                      navigate(`/chat/${id}`);
                       return;
                     }
                     navigate(id ? `/chat/${id}` : '/matches');

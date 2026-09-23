@@ -48,7 +48,7 @@ export function friendlyAuthError(codeOrMessage: string): string {
     'auth/wrong-password': 'Wrong password. Try again or reset it.',
     'auth/invalid-credential': 'Email or password is wrong.',
     'auth/too-many-requests': 'Too many tries. Wait a bit.',
-    'auth/network-request-failed': 'Network is down. Try again.',
+    'auth/network-request-failed': 'Connection is weak. Try again when the network settles.',
     'auth/popup-closed-by-user': 'Sign-in closed before it finished.',
     'auth/unauthorized-domain': 'Add this domain in Firebase Authentication → Settings → Authorized domains.',
   };
@@ -64,3 +64,16 @@ export const PLACEHOLDER_AVATAR =
       <text x="200" y="210" text-anchor="middle" fill="#a89a88" font-family="monospace" font-size="18">NO PHOTO</text>
     </svg>`
   );
+
+/** Tiny stand-in while a photo loads on a slow link. */
+export function platePlaceholder(w = 64, h = 80): string {
+  return (
+    'data:image/svg+xml,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+        <rect width="100%" height="100%" fill="#1c1814"/>
+        <rect x="4" y="4" width="${w - 8}" height="${h - 8}" fill="none" stroke="#3a3228" stroke-width="1"/>
+      </svg>`
+    )
+  );
+}

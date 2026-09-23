@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { collection, query, where, onSnapshot, getDoc, doc, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
+import { withTimeout } from './lib/network';
 
 export interface MatchUser {
   uid: string;
@@ -104,7 +105,8 @@ export async function fetchDiscoveryProfiles(
   excludeUids: string[]
 ): Promise<MatchUser[]> {
   const q = query(collection(db, 'users'), where('onboarded', '==', true));
-  const snap = await getDocs(q);
+  // Low networks: never hang the deck on Firestore — time out and use seeds.
+  const snap = await withTimeout(getDocs(q), 8000, 'Profile load');
   const exclude = new Set([currentUid, ...excludeUids]);
   const results: MatchUser[] = [];
 
@@ -142,14 +144,18 @@ export async function fetchDiscoveryProfiles(
 }
 
 export async function getSwipedUids(userId: string): Promise<{ liked: string[]; passed: string[] }> {
-  const q = query(collection(db, 'likes'), where('senderId', '==', userId));
-  const snap = await getDocs(q);
   const liked: string[] = [];
   const passed: string[] = [];
-  snap.forEach((d) => {
-    const data = d.data();
-    if (data.action === 'pass') passed.push(data.receiverId);
-    else liked.push(data.receiverId);
-  });
+  try {
+    const q = query(collection(db, 'likes'), where('senderId', '==', userId));
+    const snap = await withTimeout(getDocs(q), 6000, 'Swipe history');
+    snap.forEach((d) => {
+      const data = d.data();
+      if (data.action === 'pass') passed.push(data.receiverId);
+      else liked.push(data.receiverId);
+    });
+  } catch {
+    // offline / timeout — local ledger still applies via exclude list
+  }
   return { liked, passed };
 }

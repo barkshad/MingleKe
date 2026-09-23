@@ -157,6 +157,66 @@ async function startServer() {
     res.json({ ok: true, name: "MingleKE", time: new Date().toISOString() });
   });
 
+  // Lightweight match-chat reply. Uses Gemini when GEMINI_API_KEY is set.
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { persona, history = [], message } = req.body || {};
+      if (!message || typeof message !== "string") {
+        return res.status(400).json({ error: "message is required" });
+      }
+
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return res.json({
+          demo: true,
+          reply: null,
+          note: "No GEMINI_API_KEY — client falls back to local bot",
+        });
+      }
+
+      const system = [
+        `You are ${persona?.name || "a member"} on MingleKE, a dating app in Kenya.`,
+        persona?.age ? `Age ${persona.age}.` : "",
+        persona?.city ? `Based near ${persona.city}.` : "",
+        persona?.bio ? `Bio: ${persona.bio}` : "",
+        persona?.interests?.length ? `Interests: ${persona.interests.join(", ")}` : "",
+        `Write one short chat reply (max 2 sentences). Casual Kenyan English/Sheng ok.`,
+        `No lists, no markdown, no emoji spam. Flirty but respectful. Never ask for money.`,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      const transcript = (history as Array<{ senderId: string; text: string }>)
+        .slice(-12)
+        .map((m) => `${m.senderId === "bot" ? "You" : "Them"}: ${m.text}`)
+        .join("\n");
+
+      const prompt = `${system}\n\nConversation:\n${transcript}\nThem: ${message}\nYou:`;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const response = await axios.post(
+        url,
+        {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.85, maxOutputTokens: 120 },
+        },
+        { timeout: 8000 }
+      );
+
+      const reply =
+        response.data?.candidates?.[0]?.content?.parts
+          ?.map((p: any) => p.text)
+          .filter(Boolean)
+          .join(" ")
+          .trim() || null;
+
+      res.json({ reply, demo: false });
+    } catch (error: any) {
+      console.error("chat error", error?.message || error);
+      res.json({ reply: null, demo: true });
+    }
+  });
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

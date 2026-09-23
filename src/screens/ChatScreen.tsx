@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Send, Shield } from 'lucide-react';
 import {
@@ -18,6 +18,16 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { cn, PLACEHOLDER_AVATAR } from '../lib/utils';
 import { Avatar } from '../components/Avatar';
 import { useToast } from '../components/Toast';
+import { NetworkBanner } from '../components/NetworkBanner';
+import {
+  isDemoThreadId,
+  getDemoThread,
+  appendDemoMessage,
+  ensureDemoThread,
+  type DemoMessage,
+} from '../lib/demoChat';
+import { botReply, openerFor } from '../lib/chatBot';
+import { SEED_PROFILES } from '../lib/seedProfiles';
 
 interface Message {
   id: string;
@@ -39,13 +49,65 @@ export default function ChatScreen() {
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const { user } = useAuth();
+  const [typing, setTyping] = useState(false);
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const toast = useToast((s) => s.show);
+  const demo = !!matchId && isDemoThreadId(matchId);
 
+  const seedUid = useMemo(() => {
+    if (!matchId?.startsWith('demo-')) return '';
+    // demo-<seedUid>-<userId>
+    const parts = matchId.replace(/^demo-/, '');
+    const uid = user?.uid || 'guest-inspect';
+    return parts.endsWith(`-${uid}`) ? parts.slice(0, -(uid.length + 1)) : parts.split('-')[0];
+  }, [matchId, user?.uid]);
+
+  // —— demo (seed) thread ——
   useEffect(() => {
-    if (!user || !matchId) return;
+    if (!demo || !matchId) return;
+    const seed = SEED_PROFILES.find((s) => s.uid === seedUid) || SEED_PROFILES.find((s) => matchId.includes(s.uid));
+    setOtherUser({
+      uid: seedUid || 'seed',
+      name: seed?.name || 'Member',
+      photos: seed?.photos || [],
+    });
+
+    const thread = getDemoThread(matchId);
+    const mapped: Message[] = (thread?.messages || []).map((m: DemoMessage) => ({
+      id: m.id,
+      text: m.text,
+      senderId: m.fromBot ? 'bot' : m.senderId,
+      createdAt: { toDate: () => new Date(m.createdAt) },
+    }));
+    setMessages(mapped);
+    setLoading(false);
+
+    // Kick off an opener if the thread is brand new
+    if (mapped.length === 0 && user) {
+      void (async () => {
+        const open = await openerFor(seedUid || seed?.uid || 'seed', profile?.name || 'you');
+        const msg: DemoMessage = {
+          id: `m-${Date.now()}`,
+          matchId,
+          senderId: 'bot',
+          text: open,
+          createdAt: Date.now(),
+          fromBot: true,
+        };
+        appendDemoMessage(matchId, msg);
+        setMessages((prev) => [
+          ...prev,
+          { id: msg.id, text: msg.text, senderId: 'bot', createdAt: { toDate: () => new Date(msg.createdAt) } },
+        ]);
+      })();
+    }
+  }, [demo, matchId, seedUid, user, profile?.name]);
+
+  // —— live Firestore thread ——
+  useEffect(() => {
+    if (demo || !user || !matchId) return;
 
     (async () => {
       try {
@@ -84,11 +146,38 @@ export default function ChatScreen() {
     );
 
     return () => unsubscribe();
-  }, [user, matchId, navigate, toast]);
+  }, [demo, matchId, user, navigate, toast]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ block: 'end' });
-  }, [messages]);
+  }, [messages, typing]);
+
+  const pushBotReply = async (history: Array<{ senderId: string; text: string }>, userText: string) => {
+    if (!matchId) return;
+    setTyping(true);
+    const delay = 700 + Math.random() * 900;
+    await new Promise((r) => setTimeout(r, delay));
+    try {
+      const reply = await botReply(seedUid || 'seed', history, userText);
+      const msg: DemoMessage = {
+        id: `m-${Date.now()}-bot`,
+        matchId,
+        senderId: 'bot',
+        text: reply,
+        createdAt: Date.now(),
+        fromBot: true,
+      };
+      appendDemoMessage(matchId, msg);
+      setMessages((prev) => [
+        ...prev,
+        { id: msg.id, text: msg.text, senderId: 'bot', createdAt: { toDate: () => new Date(msg.createdAt) } },
+      ]);
+    } catch {
+      // silent
+    } finally {
+      setTyping(false);
+    }
+  };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +186,32 @@ export default function ChatScreen() {
 
     setInputText('');
     setSending(true);
+
+    const history = messages.map((m) => ({
+      senderId: m.senderId === 'bot' ? 'bot' : m.senderId,
+      text: m.text,
+    }));
+
     try {
+      if (demo) {
+        ensureDemoThread(seedUid, user.uid);
+        const msg: DemoMessage = {
+          id: `m-${Date.now()}`,
+          matchId,
+          senderId: user.uid,
+          text: msgText.slice(0, 2000),
+          createdAt: Date.now(),
+        };
+        appendDemoMessage(matchId, msg);
+        setMessages((prev) => [
+          ...prev,
+          { id: msg.id, text: msg.text, senderId: user.uid, createdAt: { toDate: () => new Date(msg.createdAt) } },
+        ]);
+        setSending(false);
+        void pushBotReply(history, msgText);
+        return;
+      }
+
       await addDoc(collection(db, 'matches', matchId, 'messages'), {
         matchId,
         senderId: user.uid,
@@ -110,7 +224,7 @@ export default function ChatScreen() {
         lastMessageAt: serverTimestamp(),
       });
     } catch {
-      toast('Message failed.', 'error');
+      toast('Message failed. Retrying is safe on demo chats.', 'error');
       setInputText(msgText);
     } finally {
       setSending(false);
@@ -119,6 +233,7 @@ export default function ChatScreen() {
 
   return (
     <div className="flex-1 flex flex-col relative z-10 text-bone bg-ink min-h-0">
+      <NetworkBanner />
       <header className="flex items-center gap-2 page-pad py-3 border-b border-line shrink-0">
         <button
           onClick={() => navigate('/matches')}
@@ -136,7 +251,7 @@ export default function ChatScreen() {
           <p className="type-display text-base normal-case tracking-normal font-semibold truncate">
             {otherUser?.name || '…'}
           </p>
-          <p className="type-meta text-[10px]">Matched on MingleKE</p>
+          <p className="type-meta text-[10px]">{demo ? 'Demo member · bot replies' : 'Matched on MingleKE'}</p>
         </div>
         <Link to="/profile/safety" className="type-meta p-2 min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Safety">
           <Shield size={16} />
@@ -148,32 +263,32 @@ export default function ChatScreen() {
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 border border-line border-t-hibiscus animate-spin" />
           </div>
-        ) : messages.length === 0 ? (
+        ) : messages.length === 0 && !typing ? (
           <div className="py-16 space-y-2">
             <p className="type-meta">New thread</p>
-            <h2 className="type-display text-3xl leading-none">{otherUser?.name || 'Someone new'}</h2>
-            <p className="text-sm text-bone-dim max-w-xs">
-              Open with a real question. “hey” dies here.
+            <h2 className="fluid-display-sm">{otherUser?.name || 'Someone new'}</h2>
+            <p className="text-sm text-bone-dim max-w-md">
+              {demo
+                ? 'Send anything — this profile is wired to write back.'
+                : 'Open with a real question. “hey” dies here.'}
             </p>
           </div>
         ) : (
           <AnimatePresence initial={false}>
             {messages.map((msg) => {
-              const isMine = msg.senderId === user?.uid;
+              const isMine = msg.senderId !== 'bot' && msg.senderId === user?.uid;
               return (
                 <motion.div
                   key={msg.id}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={cn('flex max-w-[82%]', isMine ? 'ml-auto justify-end' : 'mr-auto')}
+                  className={cn('flex max-w-[85%]', isMine ? 'ml-auto justify-end' : 'mr-auto')}
                 >
                   <div>
                     <div
                       className={cn(
                         'px-3 py-2.5 text-sm leading-snug break-words',
-                        isMine
-                          ? 'bg-hibiscus text-bone'
-                          : 'bg-ink-soft border border-line text-bone'
+                        isMine ? 'bg-hibiscus text-bone' : 'bg-ink-soft border border-line text-bone'
                       )}
                     >
                       {msg.text}
@@ -191,6 +306,9 @@ export default function ChatScreen() {
               );
             })}
           </AnimatePresence>
+        )}
+        {typing && (
+          <div className="mr-auto type-meta px-1">typing…</div>
         )}
         <div ref={scrollRef} />
       </div>

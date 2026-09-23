@@ -5,6 +5,8 @@ import { ProtectedRoute, PublicRoute } from './components/Routes';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PwaPrompt } from './components/PwaPrompt';
 import { ToastHost } from './components/Toast';
+import { NetworkWatcher } from './components/NetworkWatcher';
+import { NetworkBanner } from './components/NetworkBanner';
 import LandingPage from './screens/LandingPage';
 import LandingScreen from './screens/LandingScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
@@ -22,6 +24,8 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <div className="mobile-container">
+            <NetworkWatcher />
+            <NetworkBanner />
             <PwaPrompt />
             <ToastHost />
             <Routes>
