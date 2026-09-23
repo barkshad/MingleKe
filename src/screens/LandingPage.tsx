@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FreeCountdown } from '../components/FreeCountdown';
+import { ShiftingPhotoWall } from '../components/ShiftingPhotoWall';
 import { isFreeWindow, freeWindowTextLabel } from '../lib/promo';
 import { useAuth } from '../context/AuthContext';
 
@@ -35,56 +36,43 @@ export default function LandingPage() {
 
   return (
     <div className="flex-1 overflow-y-auto bg-ink text-bone pb-16">
-      {/* Masthead plate */}
-      <header className="relative min-h-[72vh] flex flex-col justify-end border-b border-line">
-        <img
-          src="/seed/wa/p15.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-top"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = 'none';
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to top, #14110E 0%, rgba(20,17,14,0.55) 42%, rgba(20,17,14,0.15) 100%)',
-          }}
-        />
-
-        <div className="relative z-10 px-5 pb-7 pt-24">
-          <p className="type-meta mb-3">Kenya · 18+ · Free this week</p>
-          <h1 className="type-display text-[56px] sm:text-[64px] leading-[0.88] mb-4">
-            Mingle
-            <span className="text-hibiscus">KE</span>
-          </h1>
-          <p className="text-bone text-lg leading-snug max-w-[280px] mb-6">
-            Real people nearby. No slogan soup, just a deck and a date.
-          </p>
-
-          {free && (
-            <div className="mb-5 max-w-sm">
-              <FreeCountdown />
-            </div>
-          )}
-
-          <div className="flex flex-col gap-2 max-w-sm">
-            <button type="button" onClick={openApp} className="btn-primary inline-flex items-center justify-center gap-2">
-              {free ? 'Open the app' : 'Open MingleKE'}
-              <ArrowRight size={16} />
-            </button>
-            <Link to="/welcome" className="btn-secondary">
-              Log in
-            </Link>
-          </div>
-
-          <p className="type-meta mt-4 flex items-center gap-2">
-            <Shield size={12} className="text-moss shrink-0" />
-            Never send money to a match
-          </p>
-        </div>
+      {/* Shifting plates showcase */}
+      <header className="relative">
+        <ShiftingPhotoWall />
       </header>
+
+      {/* Masthead copy under the shifter so the photos stay the show */}
+      <section className="px-5 py-6 border-b border-line">
+        <p className="type-meta mb-3">Kenya · 18+ · Free this week</p>
+        <h1 className="type-display text-[52px] sm:text-[60px] leading-[0.88] mb-3">
+          Mingle
+          <span className="text-hibiscus">KE</span>
+        </h1>
+        <p className="text-bone text-base leading-snug max-w-[300px] mb-5">
+          The deck shifts. Pick one and open the real thing.
+        </p>
+
+        {free && (
+          <div className="mb-4 max-w-sm">
+            <FreeCountdown />
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 max-w-sm">
+          <button type="button" onClick={openApp} className="btn-primary inline-flex items-center justify-center gap-2">
+            {free ? 'Open the app' : 'Open MingleKE'}
+            <ArrowRight size={16} />
+          </button>
+          <Link to="/welcome" className="btn-secondary">
+            Log in
+          </Link>
+        </div>
+
+        <p className="type-meta mt-5 flex items-center gap-2">
+          <Shield size={12} className="text-moss shrink-0" />
+          Never send money to a match
+        </p>
+      </section>
 
       {/* How */}
       <section className="px-5 py-8 border-b border-line">
