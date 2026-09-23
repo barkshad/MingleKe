@@ -41,32 +41,26 @@ export function formatPhone(raw: string): string {
 
 export function friendlyAuthError(codeOrMessage: string): string {
   const map: Record<string, string> = {
-    'auth/email-already-in-use': 'That email already has an account. Try logging in.',
-    'auth/invalid-email': 'Enter a valid email address.',
+    'auth/email-already-in-use': 'That email already has an account. Log in instead.',
+    'auth/invalid-email': 'That email does not look valid.',
     'auth/weak-password': 'Password needs at least 6 characters.',
-    'auth/user-not-found': 'No account with that email. Create one instead.',
-    'auth/wrong-password': 'Incorrect password. Try again or reset it.',
-    'auth/invalid-credential': 'Email or password is incorrect.',
-    'auth/too-many-requests': 'Too many attempts. Wait a moment and try again.',
-    'auth/network-request-failed': 'Network issue. Check your connection.',
-    'auth/popup-closed-by-user': 'Google sign-in was closed before it finished.',
-    'auth/unauthorized-domain': 'This domain is not on the Firebase authorized list. Add it under Authentication → Settings.',
+    'auth/user-not-found': 'No account on that email. Create one.',
+    'auth/wrong-password': 'Wrong password. Try again or reset it.',
+    'auth/invalid-credential': 'Email or password is wrong.',
+    'auth/too-many-requests': 'Too many tries. Wait a bit.',
+    'auth/network-request-failed': 'Network is down. Try again.',
+    'auth/popup-closed-by-user': 'Sign-in closed before it finished.',
+    'auth/unauthorized-domain': 'Add this domain in Firebase Authentication → Settings → Authorized domains.',
   };
-  return map[codeOrMessage] || codeOrMessage.replace('Firebase: ', '').replace(/\(.+\)/, '').trim() || 'Something went wrong. Try again.';
+  return map[codeOrMessage] || codeOrMessage.replace('Firebase: ', '').replace(/\(.+\)/, '').trim() || 'Something broke. Try again.';
 }
 
 export const PLACEHOLDER_AVATAR =
   'data:image/svg+xml,' +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#2a2233"/>
-          <stop offset="100%" stop-color="#16101c"/>
-        </linearGradient>
-      </defs>
-      <rect width="400" height="400" fill="url(#g)"/>
-      <circle cx="200" cy="160" r="70" fill="#a89bb0" opacity="0.35"/>
-      <ellipse cx="200" cy="320" rx="110" ry="80" fill="#a89bb0" opacity="0.35"/>
+      <rect width="400" height="400" fill="#1c1814"/>
+      <rect x="20" y="20" width="360" height="360" fill="none" stroke="#3a3228" stroke-width="4"/>
+      <text x="200" y="210" text-anchor="middle" fill="#a89a88" font-family="monospace" font-size="18">NO PHOTO</text>
     </svg>`
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Heart, Mail, ArrowRight, ArrowLeft, KeyRound } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Mail, KeyRound } from 'lucide-react';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -58,48 +58,44 @@ export default function LandingScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-8 text-cream relative z-10 w-full">
-      <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="w-24 h-24 rounded-[28px] mb-8 flex items-center justify-center bg-rose/15 border border-rose/30"
-        >
-          <Heart size={48} fill="#FF4D6D" className="text-rose" />
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl font-bold mb-3 tracking-tight"
-        >
-          MingleKE
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          className="text-lg text-mist max-w-[280px] font-medium"
-        >
-          Meet people nearby. Keep it real.
-        </motion.p>
+    <div className="flex-1 flex flex-col bg-ink text-bone">
+      <div className="px-5 pt-10 pb-6 border-b border-line">
+        <Link to="/home" className="type-meta hover:text-bone">
+          ← MingleKE
+        </Link>
+        <h1 className="type-display text-[42px] mt-4 mb-2">
+          {view === 'reset'
+            ? 'Reset'
+            : view === 'email-login'
+              ? 'Log in'
+              : view === 'email-signup'
+                ? 'Join'
+                : 'Hello'}
+        </h1>
+        <p className="text-bone-dim text-sm">
+          {view === 'welcome'
+            ? 'Members must be 18 or older.'
+            : view === 'email-login'
+              ? 'Email and password.'
+              : view === 'email-signup'
+                ? 'Takes under a minute.'
+                : 'We will email a link.'}
+        </p>
       </div>
 
-      <div className="w-full max-w-sm mx-auto mb-4">
-        <FreeCountdown />
-      </div>
+      <div className="flex-1 px-5 py-6">
+        <div className="mb-5 max-w-sm">
+          <FreeCountdown compact />
+        </div>
 
-      <div className="space-y-4 mb-6 w-full max-w-sm mx-auto">
         <AnimatePresence mode="wait">
           {view === 'welcome' && (
             <motion.div
               key="welcome"
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              className="space-y-3"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2 max-w-sm"
             >
               <button onClick={() => setView('email-signup')} className="btn-primary">
                 Create account
@@ -110,94 +106,78 @@ export default function LandingScreen() {
             </motion.div>
           )}
 
-          {(view === 'email-login' || view === 'email-signup' || view === 'reset') && (
+          {view !== 'welcome' && (
             <motion.form
               key={view}
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
               onSubmit={view === 'reset' ? handleReset : handleEmailAuth}
-              className="glass-panel p-6 rounded-[28px] space-y-5 relative overflow-hidden"
+              className="space-y-4 max-w-sm"
             >
-              <div className="space-y-1">
-                <h2 className="text-2xl font-bold">
-                  {view === 'email-login' ? 'Welcome back' : view === 'email-signup' ? 'Get started' : 'Reset password'}
-                </h2>
-                <p className="text-mist text-sm">
-                  {view === 'email-login'
-                    ? 'Log in and keep swiping.'
-                    : view === 'email-signup'
-                      ? 'Create your account to start matching.'
-                      : 'We will email you a reset link.'}
-                </p>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-dim" />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-field pl-10"
+                  required
+                  autoComplete="email"
+                />
               </div>
-
-              <div className="space-y-3">
+              {view !== 'reset' && (
                 <div className="relative">
-                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-mist" />
+                  <KeyRound size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-bone-dim" />
                   <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="input-field pl-11"
+                    type="password"
+                    placeholder="Password (6+ characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-field pl-10"
                     required
-                    autoComplete="email"
+                    minLength={6}
+                    autoComplete={view === 'email-login' ? 'current-password' : 'new-password'}
                   />
                 </div>
-                {view !== 'reset' && (
-                  <div className="relative">
-                    <KeyRound size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-mist" />
-                    <input
-                      type="password"
-                      placeholder="Password (min 6 characters)"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="input-field pl-11"
-                      required
-                      minLength={6}
-                      autoComplete={view === 'email-login' ? 'current-password' : 'new-password'}
-                    />
-                  </div>
-                )}
-              </div>
+              )}
 
               {error && (
-                <p className="text-rose text-sm bg-rose/10 p-3 rounded-xl border border-rose/30" role="alert">
+                <p className="text-sm text-hibiscus border border-hibiscus/40 bg-hibiscus/10 px-3 py-2 rounded" role="alert">
                   {error}
                 </p>
               )}
 
-              <button type="submit" disabled={busy} className="btn-primary flex items-center justify-center gap-2">
-                {busy ? (
-                  <span className="inline-block h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                ) : (
-                  <>
-                    {view === 'email-login' ? 'Log in' : view === 'email-signup' ? 'Create account' : 'Send reset link'}
-                    <ArrowRight size={18} />
-                  </>
-                )}
+              <button type="submit" disabled={busy} className="btn-primary">
+                {busy
+                  ? 'Working…'
+                  : view === 'email-login'
+                    ? 'Log in'
+                    : view === 'email-signup'
+                      ? 'Create account'
+                      : 'Send reset link'}
               </button>
 
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between pt-1">
                 <button
                   type="button"
                   onClick={() => {
                     setError('');
                     setView('welcome');
                   }}
-                  className="text-mist hover:text-cream inline-flex items-center gap-1"
+                  className="type-meta hover:text-bone inline-flex items-center gap-1"
                 >
-                  <ArrowLeft size={16} /> Back
+                  <ArrowLeft size={12} /> Back
                 </button>
                 {view === 'email-login' && (
-                  <button type="button" onClick={() => setView('reset')} className="text-rose font-medium">
-                    Forgot password?
+                  <button type="button" onClick={() => setView('reset')} className="type-meta text-hibiscus">
+                    Forgot password
                   </button>
                 )}
                 {view === 'email-signup' && (
-                  <button type="button" onClick={() => setView('email-login')} className="text-rose font-medium">
-                    Have an account?
+                  <button type="button" onClick={() => setView('email-login')} className="type-meta text-hibiscus">
+                    Have an account
                   </button>
                 )}
               </div>
@@ -206,12 +186,12 @@ export default function LandingScreen() {
         </AnimatePresence>
       </div>
 
-      <p className="text-[11px] text-center text-mist px-4 leading-relaxed">
-        By continuing you agree to our{' '}
-        <Link to="/profile/safety" className="underline underline-offset-2 hover:text-cream">
-          community guidelines
+      <p className="type-meta px-5 pb-8">
+        By continuing you accept the community rules under{' '}
+        <Link to="/profile/safety" className="text-bone underline">
+          Safety
         </Link>
-        . Members must be 18 or older.
+        .
       </p>
     </div>
   );

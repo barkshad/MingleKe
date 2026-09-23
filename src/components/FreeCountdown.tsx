@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
 import { isFreeWindow, freeWindowMsLeft, formatCountdown, freeWindowTextLabel } from '../lib/promo';
 import { cn } from '../lib/utils';
 
@@ -9,77 +7,59 @@ type Props = {
   compact?: boolean;
 };
 
+/** Free-pass ticket stub. Reads like a stamp, not a SaaS banner. */
 export function FreeCountdown({ className, compact = false }: Props) {
   const [msLeft, setMsLeft] = useState(() => freeWindowMsLeft());
   const free = isFreeWindow();
 
   useEffect(() => {
     if (!free) return;
-    const id = window.setInterval(() => {
-      setMsLeft(freeWindowMsLeft());
-    }, 1000);
+    const id = window.setInterval(() => setMsLeft(freeWindowMsLeft()), 1000);
     return () => window.clearInterval(id);
   }, [free]);
 
   if (!free) return null;
 
   const t = formatCountdown(msLeft);
-  const cells: Array<{ value: number; label: string }> = [
-    { value: t.days, label: 'days' },
-    { value: t.hours, label: 'hrs' },
-    { value: t.minutes, label: 'min' },
-    { value: t.seconds, label: 'sec' },
+  const cells = [
+    { value: t.days, label: 'D' },
+    { value: t.hours, label: 'H' },
+    { value: t.minutes, label: 'M' },
+    { value: t.seconds, label: 'S' },
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+    <div
       className={cn(
-        'rounded-2xl border border-amber/40 bg-amber/10 backdrop-blur-md',
-        compact ? 'px-3 py-2.5' : 'px-4 py-3.5',
+        'border border-dashed border-hibiscus bg-hibiscus/10',
+        compact ? 'px-3 py-2' : 'px-4 py-3',
         className
       )}
       role="status"
       aria-live="polite"
     >
-      <div className="flex items-center gap-2 mb-2">
-        <motion.span
-          animate={{ scale: [1, 1.15, 1] }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-          className="text-amber inline-flex"
-        >
-          <Sparkles size={compact ? 14 : 16} />
-        </motion.span>
-        <p className="text-amber font-bold text-[11px] sm:text-xs uppercase tracking-wider">
-          Free for everyone — ends {freeWindowTextLabel()}
-        </p>
+      <div className="flex items-baseline justify-between gap-3 mb-2">
+        <p className="type-meta text-hibiscus">Free pass</p>
+        <p className="type-meta">Ends {freeWindowTextLabel()}</p>
       </div>
-
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-stretch gap-1">
         {cells.map((cell) => (
           <div
             key={cell.label}
-            className={cn(
-              'flex-1 text-center rounded-xl bg-black/30 border border-amber/20',
-              compact ? 'py-1.5' : 'py-2'
-            )}
+            className="flex-1 border border-line bg-ink px-1 py-1.5 text-center"
           >
             <div
               className={cn(
-                'font-bold tabular-nums text-cream leading-none',
-                compact ? 'text-base' : 'text-xl sm:text-2xl'
+                'font-mono font-bold tabular-nums text-bone leading-none',
+                compact ? 'text-base' : 'text-xl'
               )}
             >
               {String(cell.value).padStart(2, '0')}
             </div>
-            <div className="text-[9px] uppercase tracking-wider text-amber/80 mt-1">
-              {cell.label}
-            </div>
+            <div className="type-meta mt-1 text-[9px]">{cell.label}</div>
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

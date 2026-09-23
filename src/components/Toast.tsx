@@ -25,11 +25,11 @@ export function ToastHost() {
       {message && (
         <motion.button
           type="button"
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 12 }}
+          exit={{ opacity: 0, y: 8 }}
           onClick={hide}
-          className="fixed bottom-28 inset-x-4 z-[80] max-w-sm mx-auto text-left"
+          className="fixed bottom-20 inset-x-4 z-[80] max-w-sm mx-auto text-left"
         >
           <div
             className={cnToast(tone)}
@@ -44,9 +44,8 @@ export function ToastHost() {
 }
 
 function cnToast(tone: ToastTone) {
-  const base =
-    'w-full rounded-2xl px-4 py-3.5 text-sm font-medium border shadow-lg backdrop-blur-md';
-  if (tone === 'success') return `${base} bg-sage/15 border-sage/40 text-sage`;
-  if (tone === 'error') return `${base} bg-rose/15 border-rose/40 text-rose`;
-  return `${base} bg-panel border-line text-cream`;
+  const base = 'w-full px-4 py-3 text-sm border font-mono uppercase tracking-wider text-[11px]';
+  if (tone === 'success') return `${base} bg-moss/20 border-moss text-bone`;
+  if (tone === 'error') return `${base} bg-hibiscus/15 border-hibiscus text-hibiscus`;
+  return `${base} bg-ink-soft border-line text-bone`;
 }

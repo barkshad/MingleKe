@@ -47,11 +47,11 @@ export default function ChatScreen() {
   useEffect(() => {
     if (!user || !matchId) return;
 
-    const fetchMatchInfo = async () => {
+    (async () => {
       try {
         const matchDoc = await getDoc(doc(db, 'matches', matchId));
         if (!matchDoc.exists()) {
-          toast('This conversation no longer exists.', 'error');
+          toast('That thread is gone.', 'error');
           navigate('/matches');
           return;
         }
@@ -71,19 +71,13 @@ export default function ChatScreen() {
       } catch (err) {
         console.error(err);
       }
-    };
-
-    fetchMatchInfo();
+    })();
 
     const q = query(collection(db, 'matches', matchId, 'messages'), orderBy('createdAt', 'asc'));
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const msgs = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as Message[];
-        setMessages(msgs);
+        setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Message[]);
         setLoading(false);
       },
       () => setLoading(false)
@@ -93,7 +87,7 @@ export default function ChatScreen() {
   }, [user, matchId, navigate, toast]);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollRef.current?.scrollIntoView({ block: 'end' });
   }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
@@ -111,14 +105,12 @@ export default function ChatScreen() {
         createdAt: serverTimestamp(),
         seen: false,
       });
-
       await updateDoc(doc(db, 'matches', matchId), {
         lastMessage: msgText.slice(0, 2000),
         lastMessageAt: serverTimestamp(),
       });
-    } catch (err) {
-      console.error(err);
-      toast('Message failed to send.', 'error');
+    } catch {
+      toast('Message failed.', 'error');
       setInputText(msgText);
     } finally {
       setSending(false);
@@ -126,51 +118,43 @@ export default function ChatScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col relative z-20 w-full text-cream bg-ink">
-      <header className="h-20 pb-2 border-b border-line flex items-end px-3 gap-2 glass-panel sticky top-0 z-20">
+    <div className="flex-1 flex flex-col relative z-10 text-bone bg-ink pb-2">
+      <header className="flex items-center gap-2 px-3 py-3 border-b border-line">
         <button
           onClick={() => navigate('/matches')}
-          className="p-2 text-mist hover:text-cream transition-colors min-w-[44px] min-h-[44px]"
-          aria-label="Back to matches"
+          className="p-2 text-bone-dim hover:text-bone min-h-[44px] min-w-[44px]"
+          aria-label="Back"
         >
-          <ChevronLeft size={28} />
+          <ChevronLeft size={22} />
         </button>
-        <div className="flex-1 flex items-center gap-3 pb-2 min-w-0">
-          <Avatar
-            src={otherUser?.photos?.[0]}
-            alt={otherUser?.name || 'Match'}
-            className="w-11 h-11 rounded-full shrink-0"
-          />
-          <div className="min-w-0">
-            <h2 className="font-bold text-cream text-lg leading-tight truncate">
-              {otherUser?.name || '…'}
-            </h2>
-            <p className="text-[11px] text-mist">Matched on MingleKE</p>
-          </div>
+        <Avatar
+          src={otherUser?.photos?.[0] || PLACEHOLDER_AVATAR}
+          alt={otherUser?.name || 'Match'}
+          className="w-9 h-9 object-cover object-top shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="type-display text-base normal-case tracking-normal font-semibold truncate">
+            {otherUser?.name || '…'}
+          </p>
+          <p className="type-meta text-[10px]">Matched on MingleKE</p>
         </div>
-        <Link
-          to="/profile/safety"
-          className="p-3 mb-2 glass-panel rounded-full text-mist hover:text-rose transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
-          aria-label="Safety tips"
-        >
-          <Shield size={18} />
+        <Link to="/profile/safety" className="type-meta p-2 min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Safety">
+          <Shield size={16} />
         </Link>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-3">
         {loading ? (
-          <div className="flex items-center justify-center p-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-line border-t-rose" />
+          <div className="flex justify-center py-20">
+            <div className="h-8 w-8 border border-line border-t-hibiscus animate-spin" />
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-            <Avatar
-              src={otherUser?.photos?.[0] || PLACEHOLDER_AVATAR}
-              alt={otherUser?.name || 'Match'}
-              className="w-20 h-20 rounded-full"
-            />
-            <h3 className="text-xl font-bold">You matched with {otherUser?.name || 'someone new'}</h3>
-            <p className="text-mist text-sm max-w-[240px]">Open with something real. A question beats “hey”.</p>
+          <div className="py-16 space-y-2">
+            <p className="type-meta">New thread</p>
+            <h2 className="type-display text-3xl leading-none">{otherUser?.name || 'Someone new'}</h2>
+            <p className="text-sm text-bone-dim max-w-xs">
+              Open with a real question. “hey” dies here.
+            </p>
           </div>
         ) : (
           <AnimatePresence initial={false}>
@@ -179,28 +163,30 @@ export default function ChatScreen() {
               return (
                 <motion.div
                   key={msg.id}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={cn('flex flex-col max-w-[82%]', isMine ? 'ml-auto items-end' : 'mr-auto items-start')}
+                  className={cn('flex max-w-[82%]', isMine ? 'ml-auto justify-end' : 'mr-auto')}
                 >
-                  <div
-                    className={cn(
-                      'px-4 py-3 rounded-3xl text-[15px] font-medium break-words',
-                      isMine
-                        ? 'bg-rose text-white rounded-br-md'
-                        : 'glass-panel border border-line text-cream rounded-bl-md'
+                  <div>
+                    <div
+                      className={cn(
+                        'px-3 py-2.5 text-sm leading-snug break-words',
+                        isMine
+                          ? 'bg-hibiscus text-bone'
+                          : 'bg-ink-soft border border-line text-bone'
+                      )}
+                    >
+                      {msg.text}
+                    </div>
+                    {msg.createdAt?.toDate && (
+                      <p className="type-meta text-[9px] mt-1">
+                        {new Date(msg.createdAt.toDate()).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
                     )}
-                  >
-                    {msg.text}
                   </div>
-                  {msg.createdAt?.toDate && (
-                    <span className="text-[10px] text-mist/70 mt-1 px-2">
-                      {new Date(msg.createdAt.toDate()).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  )}
                 </motion.div>
               );
             })}
@@ -209,26 +195,24 @@ export default function ChatScreen() {
         <div ref={scrollRef} />
       </div>
 
-      <div className="p-3 pb-6">
-        <form onSubmit={handleSend} className="glass-panel p-1.5 rounded-full border border-line flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Write a message…"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            className="flex-1 bg-transparent border-none focus:outline-none py-3 px-3 text-cream placeholder:text-mist/50 font-medium"
-            maxLength={2000}
-          />
-          <button
-            type="submit"
-            disabled={!inputText.trim() || sending}
-            className="w-12 h-12 rounded-full bg-rose text-white flex items-center justify-center disabled:opacity-30 transition-all active:scale-95 hover:bg-rose-deep shrink-0"
-            aria-label="Send message"
-          >
-            <Send size={18} className="ml-0.5" />
-          </button>
-        </form>
-      </div>
+      <form onSubmit={handleSend} className="flex gap-2 px-3 pb-3 border-t border-line pt-3">
+        <input
+          type="text"
+          placeholder="Write something real…"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          className="input-field flex-1 py-3"
+          maxLength={2000}
+        />
+        <button
+          type="submit"
+          disabled={!inputText.trim() || sending}
+          className="btn-primary !w-auto px-4 shrink-0"
+          aria-label="Send"
+        >
+          <Send size={16} />
+        </button>
+      </form>
     </div>
   );
 }
