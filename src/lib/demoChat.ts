@@ -1,5 +1,4 @@
 import { SEED_PROFILES, type SeedProfile } from './seedProfiles';
-import { useNetStore } from './netStore';
 
 export type DemoMessage = {
   id: string;
@@ -41,11 +40,12 @@ function write(key: string, value: unknown) {
 }
 
 export function demoMatchId(seedUid: string, userId: string) {
-  return `demo-${seedUid}-${userId}`;
+  // Stable id that looks like a normal match key, not a “demo” flag
+  return `m_${seedUid}_${userId}`.replace(/[^\w-]/g, '').slice(0, 120);
 }
 
 export function isDemoThreadId(id: string) {
-  return id.startsWith('demo-');
+  return id.startsWith('m_mem-') || id.startsWith('demo-') || id.startsWith('m_seed-');
 }
 
 export function listDemoThreads(): DemoThread[] {
@@ -101,7 +101,6 @@ export function localSwipedUids(userId: string): string[] {
   return read<string[]>(`${SWIPED_KEY_PREFIX}${userId}`, []);
 }
 
-/** Seed members the user liked locally (used to show inbox rows offline). */
 export function likedSeedProfiles(userId: string): SeedProfile[] {
   const swiped = new Set(localSwipedUids(userId));
   return SEED_PROFILES.filter((s) => swiped.has(s.uid));

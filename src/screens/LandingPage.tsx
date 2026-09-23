@@ -105,14 +105,14 @@ export default function LandingPage() {
             />
             <div className="absolute left-3 right-3 bottom-3 flex items-end justify-between gap-2">
               <div>
-                <span className="nameplate text-2xl">Zawadi, 24</span>
+                <span className="nameplate text-2xl">Zawadi</span>
                 <p className="type-meta mt-1 text-bone/80">Nairobi · 2 km</p>
               </div>
               <span className="type-meta bg-ink/80 border border-line px-2 py-1">Like</span>
             </div>
           </div>
         </div>
-        <p className="type-meta mt-2">Demo member · photo from the seed deck</p>
+        <p className="type-meta mt-2">From the community</p>
       </section>
 
       {/* Install */}

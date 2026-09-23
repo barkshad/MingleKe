@@ -131,7 +131,6 @@ export function ShiftingPhotoWall() {
           >
             <h2 className="nameplate text-xl sm:text-2xl md:text-3xl max-w-full truncate">
               {current?.name}
-              {current?.age ? `, ${current.age}` : ''}
             </h2>
             <p className="type-meta mt-2">
               {current?.location?.city}

@@ -57,11 +57,14 @@ export default function ChatScreen() {
   const demo = !!matchId && isDemoThreadId(matchId);
 
   const seedUid = useMemo(() => {
-    if (!matchId?.startsWith('demo-')) return '';
-    // demo-<seedUid>-<userId>
-    const parts = matchId.replace(/^demo-/, '');
+    if (!matchId) return '';
+    // ids look like m_mem-003_<userId>
+    const raw = matchId.replace(/^m_/, '').replace(/^demo-/, '');
     const uid = user?.uid || 'guest-inspect';
-    return parts.endsWith(`-${uid}`) ? parts.slice(0, -(uid.length + 1)) : parts.split('-')[0];
+    if (raw.includes(`_${uid}`)) return raw.replace(`_${uid}`, '');
+    if (raw.includes(`-${uid}`)) return raw.replace(`-${uid}`, '');
+    const m = raw.match(/^(mem-[\w-]+|seed-[\w-]+|wa-[\w-]+)/);
+    return m ? m[1] : raw.split('_')[0].split('-')[0];
   }, [matchId, user?.uid]);
 
   // —— demo (seed) thread ——
@@ -84,24 +87,31 @@ export default function ChatScreen() {
     setMessages(mapped);
     setLoading(false);
 
-    // Kick off an opener if the thread is brand new
+    // Wait before the opener — instant “hi” after a match reads fake
     if (mapped.length === 0 && user) {
-      void (async () => {
-        const open = await openerFor(seedUid || seed?.uid || 'seed', profile?.name || 'you');
-        const msg: DemoMessage = {
-          id: `m-${Date.now()}`,
-          matchId,
-          senderId: 'bot',
-          text: open,
-          createdAt: Date.now(),
-          fromBot: true,
-        };
-        appendDemoMessage(matchId, msg);
-        setMessages((prev) => [
-          ...prev,
-          { id: msg.id, text: msg.text, senderId: 'bot', createdAt: { toDate: () => new Date(msg.createdAt) } },
-        ]);
-      })();
+      const wait = 4500 + Math.random() * 7000;
+      const timer = window.setTimeout(() => {
+        void (async () => {
+          setTyping(true);
+          await new Promise((r) => setTimeout(r, 1800 + Math.random() * 2200));
+          const open = await openerFor(seedUid || seed?.uid || 'seed', profile?.name || 'you');
+          const msg: DemoMessage = {
+            id: `m-${Date.now()}`,
+            matchId,
+            senderId: 'bot',
+            text: open,
+            createdAt: Date.now(),
+            fromBot: true,
+          };
+          appendDemoMessage(matchId, msg);
+          setTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            { id: msg.id, text: msg.text, senderId: 'bot', createdAt: { toDate: () => new Date(msg.createdAt) } },
+          ]);
+        })();
+      }, wait);
+      return () => window.clearTimeout(timer);
     }
   }, [demo, matchId, seedUid, user, profile?.name]);
 
@@ -154,9 +164,13 @@ export default function ChatScreen() {
 
   const pushBotReply = async (history: Array<{ senderId: string; text: string }>, userText: string) => {
     if (!matchId) return;
+    // Read delay + typing time, closer to how a person texts
+    const readPause = 1200 + Math.random() * 2800;
+    const typeTime = Math.min(4500, 1400 + userText.length * 40 + Math.random() * 1600);
+    setTyping(false);
+    await new Promise((r) => setTimeout(r, readPause));
     setTyping(true);
-    const delay = 700 + Math.random() * 900;
-    await new Promise((r) => setTimeout(r, delay));
+    await new Promise((r) => setTimeout(r, typeTime));
     try {
       const reply = await botReply(seedUid || 'seed', history, userText);
       const msg: DemoMessage = {
@@ -224,7 +238,7 @@ export default function ChatScreen() {
         lastMessageAt: serverTimestamp(),
       });
     } catch {
-      toast('Message failed. Retrying is safe on demo chats.', 'error');
+      toast('Message failed. Try again.', 'error');
       setInputText(msgText);
     } finally {
       setSending(false);
@@ -251,7 +265,7 @@ export default function ChatScreen() {
           <p className="type-display text-base normal-case tracking-normal font-semibold truncate">
             {otherUser?.name || '…'}
           </p>
-          <p className="type-meta text-[10px]">{demo ? 'Demo member · bot replies' : 'Matched on MingleKE'}</p>
+          <p className="type-meta text-[10px]">Matched on MingleKE</p>
         </div>
         <Link to="/profile/safety" className="type-meta p-2 min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Safety">
           <Shield size={16} />
@@ -268,9 +282,7 @@ export default function ChatScreen() {
             <p className="type-meta">New thread</p>
             <h2 className="fluid-display-sm">{otherUser?.name || 'Someone new'}</h2>
             <p className="text-sm text-bone-dim max-w-md">
-              {demo
-                ? 'Send anything — this profile is wired to write back.'
-                : 'Open with a real question. “hey” dies here.'}
+              Open with a real question. “hey” dies here.
             </p>
           </div>
         ) : (

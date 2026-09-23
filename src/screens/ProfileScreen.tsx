@@ -122,7 +122,7 @@ export default function ProfileScreen() {
 
           {isGuest && (
             <p className="type-meta mb-4 border border-dashed border-hibiscus/50 px-3 py-2 text-hibiscus">
-              Inspect mode — changes stay in this browser only
+              Signed in on this device
             </p>
           )}
 
@@ -130,7 +130,7 @@ export default function ProfileScreen() {
             onClick={handleLogout}
             className="w-full border border-hibiscus/40 text-hibiscus type-display uppercase tracking-wider py-4 rounded-md hover:bg-hibiscus/10 min-h-[56px]"
           >
-            {isGuest ? 'Exit inspect mode' : 'Log out'}
+            Log out
           </button>
 
           <p className="type-meta mt-6 text-center">MingleKE 2.1 · Nairobi</p>

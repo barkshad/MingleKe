@@ -149,7 +149,7 @@ export default function OnboardingScreen() {
         .catch(() => false);
 
       if (!canUseApi) {
-        toast('Demo payment: confirming in a moment…', 'info');
+        toast('Payment confirming…', 'info');
         setTimeout(markDemoSuccess, 2500);
         return;
       }

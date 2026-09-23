@@ -24,7 +24,7 @@ import { FreeCountdown } from '../components/FreeCountdown';
 import { isFreeWindow } from '../lib/promo';
 import { useNavigate } from 'react-router-dom';
 
-const isSeedUid = (uid: string) => uid.startsWith('seed-') || uid.startsWith('wa-');
+const isSeedUid = (uid: string) => uid.startsWith('mem-') || uid.startsWith('seed-') || uid.startsWith('wa-');
 
 export default function DiscoveryScreen() {
   const [profiles, setProfiles] = useState<MatchUser[]>([]);
@@ -36,6 +36,7 @@ export default function DiscoveryScreen() {
   const [matchId, setMatchId] = useState<string | null>(null);
   const [swiping, setSwiping] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showProfileDetail, setShowProfileDetail] = useState(false);
   const [minAge, setMinAge] = useState(18);
   const [maxAge, setMaxAge] = useState(45);
   const { user, profile: currentUserProfile } = useAuth();
@@ -300,7 +301,6 @@ export default function DiscoveryScreen() {
                 <div className="absolute inset-x-2 sm:inset-x-3 bottom-2 sm:bottom-3 z-30 flex items-end justify-between gap-2">
                   <h2 className="nameplate text-lg sm:text-2xl md:text-[28px] max-w-full truncate">
                     {currentProfile.name}
-                    {currentProfile.age ? `, ${currentProfile.age}` : ''}
                   </h2>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleReport(currentProfile.uid); }}
@@ -332,10 +332,19 @@ export default function DiscoveryScreen() {
       {/* Details strip — never covered by Pass/Like */}
       {currentProfile && (
         <div className="shrink-0 page-pad py-2.5 border-t border-line">
-          <p className="type-meta truncate mb-1">
-            {currentProfile.location?.city || 'Nearby'}
-            {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
-          </p>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <p className="type-meta truncate">
+              {currentProfile.location?.city || 'Nearby'}
+              {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowProfileDetail(true)}
+              className="type-meta text-hibiscus shrink-0"
+            >
+              Profile
+            </button>
+          </div>
           {currentProfile.bio && (
             <p className="text-sm text-bone leading-snug line-clamp-2 mb-1.5">{currentProfile.bio}</p>
           )}
@@ -401,11 +410,7 @@ export default function DiscoveryScreen() {
                   onClick={() => {
                     const id = matchId;
                     setMatchFound(null);
-                    if (id && isDemoThreadId(id)) {
-                      navigate(`/chat/${id}`);
-                      return;
-                    }
-                    navigate(id ? `/chat/${id}` : '/matches');
+                    if (id) navigate(`/chat/${id}`);
                   }}
                   className="btn-primary"
                 >
@@ -415,6 +420,56 @@ export default function DiscoveryScreen() {
                   Keep swiping
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showProfileDetail && currentProfile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[88] bg-ink/92 flex items-end sm:items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              className="panel w-full max-w-md p-5 space-y-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="fluid-display-sm">{currentProfile.name}</h3>
+                <button
+                  onClick={() => setShowProfileDetail(false)}
+                  className="type-meta min-h-[44px] px-2"
+                >
+                  Close
+                </button>
+              </div>
+              {/* Age only on full profile — deck stays age-free */}
+              {currentProfile.age ? (
+                <p className="type-meta">Age {currentProfile.age}</p>
+              ) : null}
+              <p className="type-meta">
+                {currentProfile.location?.city || 'Nearby'}
+                {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
+              </p>
+              {currentProfile.bio && (
+                <p className="text-sm text-bone leading-relaxed">{currentProfile.bio}</p>
+              )}
+              {currentProfile.interests?.length ? (
+                <div className="flex flex-wrap gap-1">
+                  {currentProfile.interests.map((tag) => (
+                    <span key={tag} className="type-meta border border-line px-2 py-1">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <button onClick={() => setShowProfileDetail(false)} className="btn-primary">
+                Back to photos
+              </button>
             </motion.div>
           </motion.div>
         )}

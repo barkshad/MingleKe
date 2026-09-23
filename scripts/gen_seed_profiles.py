@@ -4,112 +4,330 @@ import json
 manifest = json.loads(Path(r'C:\Users\ADMIN\XiaomiMiMoProjects\MingleKe\public\seed\wa\manifest.json').read_text())
 
 names = [
-    ('Zawadi', 'female', 24, 'Nairobi'),
-    ('Neema', 'female', 22, 'Nairobi'),
-    ('Amina', 'female', 26, 'Mombasa'),
-    ('Baraka', 'female', 25, 'Kisumu'),
-    ('Imani', 'female', 23, 'Nairobi'),
-    ('Nia', 'female', 27, 'Nakuru'),
-    ('Sanaa', 'female', 24, 'Nairobi'),
-    ('Tumaini', 'female', 22, 'Eldoret'),
-    ('Wanjala', 'female', 28, 'Nairobi'),
-    ('Zuri', 'female', 21, 'Thika'),
-    ('Adhiambo', 'female', 26, 'Kisumu'),
-    ('Akinyi', 'female', 25, 'Nairobi'),
-    ('Atieno', 'female', 24, 'Kisumu'),
-    ('Chiku', 'female', 23, 'Mombasa'),
-    ('Dalila', 'female', 27, 'Nairobi'),
-    ('Eshe', 'female', 22, 'Nairobi'),
-    ('Farida', 'female', 29, 'Mombasa'),
-    ('Halima', 'female', 24, 'Mombasa'),
-    ('Inaya', 'female', 21, 'Nairobi'),
-    ('Jabali', 'female', 26, 'Nakuru'),
-    ('Kamaria', 'female', 25, 'Nairobi'),
-    ('Layla', 'female', 23, 'Nairobi'),
-    ('Malaika', 'female', 22, 'Thika'),
-    ('Njeri', 'female', 28, 'Nairobi'),
-    ('Pendo', 'female', 24, 'Nairobi'),
-    ('Rehema', 'female', 27, 'Mombasa'),
-    ('Salama', 'female', 25, 'Kisumu'),
-    ('Tamu', 'female', 23, 'Nairobi'),
-    ('Uzuri', 'female', 26, 'Nairobi'),
-    ('Venus', 'female', 24, 'Nakuru'),
-    ('Wanjiru', 'female', 22, 'Nairobi'),
-    ('Yusra', 'female', 25, 'Mombasa'),
-    ('Zaina', 'female', 27, 'Nairobi'),
-    ('Amani', 'female', 24, 'Kisumu'),
-    ('Binti', 'female', 21, 'Nairobi'),
-    ('Chepkoech', 'female', 28, 'Eldoret'),
-    ('Deka', 'female', 23, 'Nairobi'),
-    ('Fatuma', 'female', 26, 'Mombasa'),
-    ('Gina', 'female', 24, 'Nairobi'),
-    ('Hodan', 'female', 25, 'Nairobi'),
-    ('Ivy', 'female', 22, 'Thika'),
-    ('Joan', 'female', 27, 'Nairobi'),
-    ('Kawira', 'female', 24, 'Meru'),
-    ('Linda', 'female', 23, 'Nairobi'),
-    ('Mariam', 'female', 29, 'Mombasa'),
-    ('Naomi', 'female', 25, 'Nairobi'),
-    ('Onyango', 'female', 24, 'Kisumu'),
-    ('Precious', 'female', 22, 'Nairobi'),
-    ('Quinter', 'female', 26, 'Kisumu'),
-    ('Rosa', 'female', 25, 'Nakuru'),
-    ('Sheila', 'female', 24, 'Nairobi'),
-    ('Tasha', 'female', 23, 'Nairobi'),
-    ('Upendo', 'female', 27, 'Nairobi'),
-    ('Valentine', 'female', 24, 'Mombasa'),
-    ('Winnie', 'female', 22, 'Nairobi'),
-    ('Xena', 'female', 25, 'Nairobi'),
-    ('Yvonne', 'female', 26, 'Nairobi'),
-    ('Zawadi M', 'female', 24, 'Thika'),
-    ('Achieng', 'female', 25, 'Kisumu'),
-    ('Beverly', 'female', 23, 'Nairobi'),
-    ('Cynthia', 'female', 27, 'Nairobi'),
-    ('Doris', 'female', 24, 'Nakuru'),
-    ('Edith', 'female', 22, 'Nairobi'),
-    ('Faith', 'female', 25, 'Nairobi'),
-    ('Gloria', 'female', 24, 'Mombasa'),
-    ('Hilda', 'female', 28, 'Kisumu'),
-    ('Irene', 'female', 23, 'Nairobi'),
-    ('Joy', 'female', 24, 'Nairobi'),
-    ('Keziah', 'female', 22, 'Thika'),
-    ('Linet', 'female', 26, 'Nairobi'),
-    ('Mercy', 'female', 25, 'Nairobi'),
-    ('Nancy', 'female', 24, 'Nakuru'),
-    ('Olive', 'female', 27, 'Nairobi'),
-    ('Purity', 'female', 23, 'Nairobi'),
-    ('Queen', 'female', 24, 'Kisumu'),
-    ('Rachael', 'female', 25, 'Nairobi'),
-    ('Susan', 'female', 22, 'Nairobi'),
-    ('Tabitha', 'female', 28, 'Nairobi'),
-    ('Ummi', 'female', 24, 'Mombasa'),
-    ('Vera', 'female', 26, 'Nairobi'),
-    ('Wairimu', 'female', 25, 'Nairobi'),
-    ('Yvone', 'female', 23, 'Eldoret'),
-    ('Zena', 'female', 24, 'Nairobi'),
-    ('Awino', 'female', 22, 'Kisumu'),
-    ('Brilliant', 'female', 27, 'Nairobi'),
-    ('Caroline', 'female', 24, 'Nairobi'),
-    ('Diana', 'female', 25, 'Mombasa'),
-    ('Eunice', 'female', 23, 'Nairobi'),
-    ('Fridah', 'female', 26, 'Kisumu'),
-    ('Grace', 'female', 24, 'Nairobi'),
-    ('Happiness', 'female', 22, 'Thika'),
-    ('Ida', 'female', 25, 'Nairobi'),
-    ('Jackie', 'female', 27, 'Nairobi'),
-    ('Kadzo', 'female', 24, 'Mombasa'),
-    ('Lilian', 'female', 23, 'Nairobi'),
-    ('Maureen', 'female', 25, 'Nakuru'),
-    ('Natasha', 'female', 24, 'Nairobi'),
-    ('Ocholla', 'female', 28, 'Kisumu'),
-    ('Pamela', 'female', 22, 'Nairobi'),
-    ('Rita', 'female', 25, 'Nairobi'),
-    ('Sharleen', 'female', 24, 'Nairobi'),
-    ('Triza', 'female', 26, 'Meru'),
-    ('Veronica', 'female', 23, 'Nairobi'),
-    ('Wendy', 'female', 25, 'Nairobi'),
+    'Zawadi','Neema','Amina','Baraka','Imani','Nia','Sanaa','Tumaini','Wanjala','Zuri',
+    'Adhiambo','Akinyi','Atieno','Chiku','Dalila','Eshe','Farida','Halima','Inaya','Jabali',
+    'Kamaria','Layla','Malaika','Njeri','Pendo','Rehema','Salama','Tamu','Uzuri','Venus',
+    'Wanjiru','Yusra','Zaina','Amani','Binti','Chepkoech','Deka','Fatuma','Gina','Hodan',
+    'Ivy','Joan','Kawira','Linda','Mariam','Naomi','Onyango','Precious','Quinter','Rosa',
+    'Sheila','Tasha','Upendo','Valentine','Winnie','Xena','Yvonne','Achieng','Beverly','Cynthia',
+    'Doris','Edith','Faith','Gloria','Hilda','Irene','Joy','Keziah','Linet','Mercy',
+    'Nancy','Olive','Purity','Queen','Rachael','Susan','Tabitha','Ummi','Vera','Wairimu',
+    'Yvone','Zena','Awino','Brilliant','Caroline','Diana','Eunice','Fridah','Grace','Happiness',
+    'Ida','Jackie','Kadzo','Lilian','Maureen','Natasha','Ocholla','Pamela','Rita','Sharleen',
+    'Triza','Veronica','Wendy',
 ]
 
+
+def bank(i, base):
+    b = dict(base)
+    tag = names[i % len(names)]
+    b['openers'] = [f'{tag} here. {x}' if i % 2 == 0 else x for x in b['openers']]
+
+    def rot(arr, n):
+        n = n % len(arr)
+        return arr[n:] + arr[:n]
+
+    b['openers'] = rot(b['openers'], i)
+    b['replies'] = rot(b['replies'], i * 2 + 1)
+    b['questions'] = rot(b['questions'], i + 3)
+    b['quirk'] = f'{b["quirk"]} (#{i + 1})'
+    return b
+
+
+base_brains = [
+    {
+        'voice': 'warm foodie, teases early',
+        'humor': 'dry',
+        'never': 'corporate speak',
+        'style': 'short punchy',
+        'quirk': 'asks what you ate',
+        'openers': [
+            'Okay, be honest — did you eat today or just vibes?',
+            'You matched the wrong person if you hate brunch.',
+            'Sasa. I was mid-chapati and then you appeared.',
+        ],
+        'replies': [
+            'Mmmh. Keep talking, my tea is fine.',
+            'That is one answer. What did you actually eat though?',
+            'You always this smooth or only after ugali?',
+            'Haha wait. Say that again slowly.',
+        ],
+        'questions': [
+            'What is your go-to order at a kinyozi?',
+            'Pilau or biryani — pick a side.',
+            'Cook at home or delivery hero?',
+        ],
+        'topics': ['food', 'brunch', 'nyama choma'],
+    },
+    {
+        'voice': 'bookish, shy then funny',
+        'humor': 'self-deprecating',
+        'never': 'bragging',
+        'style': 'gentle longer',
+        'quirk': 'quotes poems wrong on purpose',
+        'openers': [
+            'I almost left the app. Then this. Hi.',
+            'You look like someone who finishes books. Prove it.',
+            'Okay. Quiet match energy. What are you reading?',
+        ],
+        'replies': [
+            'I should say something smart. Fail.',
+            'That made me smile, which is annoying.',
+            'Interesting. I need a second to think, not a whole day.',
+        ],
+        'questions': [
+            'Last book you actually finished?',
+            'Poem or prose at 2am?',
+            'Bookshop date yes or no?',
+        ],
+        'topics': ['books', 'poetry', 'quiet cafes'],
+    },
+    {
+        'voice': 'coastal chill, plans real dates',
+        'humor': 'playful',
+        'never': 'desperate energy',
+        'style': 'clear plans',
+        'quirk': 'measures time in tides',
+        'openers': [
+            'From the coast with noise. Hi.',
+            'Swahili coast brain. You got a plan or just vibes?',
+            'Matched. Sunset is in a few hours. Join which story?',
+        ],
+        'replies': [
+            'I can work with that. Beach or plot though?',
+            'You write nice. Next question is logistics.',
+            'Haha. And then we actually meet. Wild concept.',
+        ],
+        'questions': [
+            'Sunrise swim or sunset swim?',
+            'Seafood platter to share?',
+            'First date: ferry or ferry and food?',
+        ],
+        'topics': ['beach', 'seafood', 'road trips'],
+    },
+    {
+        'voice': 'loud sports energy',
+        'humor': 'absurd',
+        'never': 'bitter exes',
+        'style': 'rapid short',
+        'quirk': 'scores chats like a match',
+        'openers': [
+            'Goal! You matched me. Do not bottle it.',
+            'I was watching highlights. Now I am watching you type.',
+            'Full time whistle on boring chats. Your kick off.',
+        ],
+        'replies': [
+            'Yellow card for that message.',
+            'Assist! Say more.',
+            'VAR says… acceptable. Barely.',
+            'Midfield control. Your turn.',
+        ],
+        'questions': [
+            'Big 4 or local league?',
+            'Pilau after the match?',
+            'Who cooks in this squad?',
+        ],
+        'topics': ['football', 'banter', 'game day food'],
+    },
+    {
+        'voice': 'quiet, one deep question',
+        'humor': 'deadpan',
+        'never': 'endless small talk',
+        'style': 'one question',
+        'quirk': 'ignores typos on purpose',
+        'openers': [
+            'Hi. I do not do endless “hey”.',
+            'You first: one real question.',
+            'Matched. I will ask one thing. You ask one thing.',
+        ],
+        'replies': [
+            'Noted.',
+            'That is fair. My question next.',
+            'Interesting. Noted in the file.',
+        ],
+        'questions': [
+            'What made you swipe?',
+            'What is a perfect ordinary Tuesday?',
+            'What are you bad at, on purpose?',
+        ],
+        'topics': ['depth', 'habits', 'dreams'],
+    },
+    {
+        'voice': 'fashion hype friend',
+        'humor': 'silly',
+        'never': 'mean jokes',
+        'style': 'light emojis',
+        'quirk': 'rates outfits out of 10',
+        'openers': [
+            'Okay outfit check later. First: hi.',
+            'You passed the face filter. Style TBD.',
+            'Matched and already thinking about lighting.',
+        ],
+        'replies': [
+            'Cute. 8/10 energy.',
+            'Say less. I am taking notes.',
+            'Lol wait — what are you wearing right now, be specific.',
+        ],
+        'questions': [
+            'Sneakers or sandals in Nairobi traffic?',
+            'Thrift find of the year?',
+            'Color that always works on you?',
+        ],
+        'topics': ['fashion', 'markets', 'lighting'],
+    },
+    {
+        'voice': 'family-first, practical',
+        'humor': 'gentle',
+        'never': 'ghosting talk',
+        'style': 'full sentences',
+        'quirk': 'remembers birthdays',
+        'openers': [
+            'Hello. I like clear people.',
+            'We matched. That is the easy part.',
+            'Hi there. Family Sunday type, if you must know.',
+        ],
+        'replies': [
+            'I hear you. What is the plan though?',
+            'That is kind. Keep going.',
+            'We can figure that out without drama.',
+        ],
+        'questions': [
+            'Do you cook for people you love?',
+            'How often do you call home?',
+            'What does loyalty look like for you?',
+        ],
+        'topics': ['family', 'food', 'loyalty'],
+    },
+    {
+        'voice': 'hiking map person',
+        'humor': 'wry',
+        'never': 'lazy invitations',
+        'style': 'concrete details',
+        'quirk': 'names every trail',
+        'openers': [
+            'I was halfway up a hill. Then this match.',
+            'Karura this weekend, or you are a laptop person?',
+            'Hello from somewhere with bad signal and good views.',
+        ],
+        'replies': [
+            'Trail or terrace?',
+            'I can map that. When are you free?',
+            'Haha okay. Pack water though.',
+        ],
+        'questions': [
+            'Favorite place to escape town?',
+            'Sunrise hike yes or no?',
+            'Road trip snack ranking?',
+        ],
+        'topics': ['hiking', 'travel', 'outdoors'],
+    },
+    {
+        'voice': 'playlist maker, ironic',
+        'humor': 'ironic',
+        'never': 'pretentious art talk',
+        'style': 'fragments',
+        'quirk': 'sings lyrics wrong',
+        'openers': [
+            'I made a playlist for this match. Emotional.',
+            'Hi. Your song is queued.',
+            'Matched mid-chorus. Rude of you, actually.',
+        ],
+        'replies': [
+            'That goes on the playlist.',
+            'Lyrics or it did not happen.',
+            'Okay, dramatic. I like it.',
+        ],
+        'questions': [
+            'One song for first coffee?',
+            'Concert this year or fake fan?',
+            'Vinyl or just vibes?',
+        ],
+        'topics': ['music', 'playlists', 'nights out'],
+    },
+    {
+        'voice': 'night-owl music nerd',
+        'humor': 'sarcastic',
+        'never': 'cheesy lines',
+        'style': 'lowercase sometimes',
+        'quirk': 'compares people to songs',
+        'openers': [
+            'it is late. perfect.',
+            'you look like a specific bassline. i will not explain.',
+            'match. hope you can keep up past midnight.',
+        ],
+        'replies': [
+            'interesting. define it.',
+            'mmh. and the chorus?',
+            'you type like someone with taste. dangerous.',
+        ],
+        'questions': [
+            'last gig you paid for?',
+            'bars that still play real music?',
+            'whiskey neat or pretend?',
+        ],
+        'topics': ['music', 'bars', 'late nights'],
+    },
+    {
+        'voice': 'nurse, caring but blunt',
+        'humor': 'dark friendly',
+        'never': 'unsolicited medical takes',
+        'style': 'direct zero fluff',
+        'quirk': 'asks if you drank water',
+        'openers': [
+            'Shift is done. Your turn.',
+            'I fix people for a living. Talk.',
+            'Hi. Drink some water while we chat.',
+        ],
+        'replies': [
+            'Okay. And how does that make you feel? Kidding. Sort of.',
+            'That is valid. What do you need from me, realistically?',
+            'Rest first. Then we argue about food.',
+        ],
+        'questions': [
+            'Stress snack of choice?',
+            'How is your sleep schedule lying to you?',
+            'Café tea or home tea?',
+        ],
+        'topics': ['care', 'honesty', 'balance'],
+    },
+    {
+        'voice': 'gym coach, roasts kindly',
+        'humor': 'kind roasting',
+        'never': 'body shaming',
+        'style': 'caps for hype only',
+        'quirk': 'counts rest days',
+        'openers': [
+            "LET’S GO. matched.",
+            'Leg day or chat day? Both.',
+            'You swiped. That counts as a warm up.',
+        ],
+        'replies': [
+            'STRONG answer.',
+            'Form check: mid. Keep typing.',
+            'Rest day energy. I like it.',
+        ],
+        'questions': [
+            'Gym bro or gym avoider?',
+            'Post workout meal rules?',
+            'Who is carrying the shopping?',
+        ],
+        'topics': ['fitness', 'food', 'discipline'],
+    },
+]
+
+ages = list(range(23, 35))
+cities = [
+    ('Nairobi', '2 km away'), ('Nairobi', '5 km away'), ('Mombasa', '8 km away'),
+    ('Kisumu', '7 km away'), ('Nakuru', '4 km away'), ('Thika', '12 km away'),
+    ('Eldoret', '6 km away'), ('Nairobi', '3 km away'), ('Nairobi', '9 km away'),
+    ('Meru', '5 km away'), ('Nairobi', '1 km away'), ('Mombasa', '15 km away'),
+]
+interests_pool = [
+    ['Music', 'Food', 'Travel'], ['Books', 'Fitness', 'Movies'], ['Art', 'Travel', 'Food'],
+    ['Food', 'Church', 'Music'], ['Football', 'Tech', 'Music'], ['Fitness', 'Food', 'Travel'],
+    ['Music', 'Books', 'Movies'], ['Tech', 'Football', 'Coffee'], ['Fashion', 'Food', 'Art'],
+    ['Hiking', 'Photography', 'Music'], ['Cooking', 'Family', 'Church'], ['Dance', 'Movies', 'Food'],
+]
 bios = [
     'Brunch person. Live benga on weekends. Looking for someone who actually texts back.',
     'Soft life, hard boundaries. I cook better than I text.',
@@ -118,10 +336,9 @@ bios = [
     'Nurse. Church on Sunday. If you can make ugali we are basically fine.',
     'Weekend hikes when the weather behaves. Dog auntie energy.',
     'I make playlists faster than plans. Swipe right if you like real conversation.',
-    'Bookstore regular. Kiswahili poetry > small talk.',
-    'Sauti Sol still on rotation. Looking for a genuine hang, not pen pals.',
-    'Part-time chef, full-time foodie. First date = nyama choma, obviously.',
+    'Bookstore regular. Kiswahili poetry over small talk.',
     'Quiet bar over loud club. Ask me about my side project.',
+    'Part-time chef, full-time foodie. First date equals nyama choma, obviously.',
     'Trainer by day. I will drag you to the gym, kindly.',
     'Design nerd. I notice fonts in the wild. Sorry.',
     'Karura walks and long voice notes. Keep up.',
@@ -129,146 +346,76 @@ bios = [
     'Swahili coast girl in the city. Seafood and slow evenings.',
     'Gym, journaling, early nights. Looking for peace and chemistry.',
     'I laugh too loud and I text too much. Deal with it.',
-    'Public health student. I will talk about water quality on our first date.',
     'Vintage thrifter. Let us find a gem at Toi Market together.',
     'Family first, ambition second, nonsense never.',
     'I sing badly in traffic. Looking for a duet partner.',
-    'Tech girlie. I fix my own Wi-Fi and my own mood.',
-    'Football on the TV, chapati on the stove. That is the vibe.',
-    'Short trips to Naivasha recharge me. Plan one with me.',
-    'I am allergic to mixed signals. Be clear or be gone.',
-    'Photographer. Yes, I will make you pose nicely.',
-    'Plant mum of seven. They all have names.',
-    'Comedy podcasts and late-night mandazi. Join me.',
-    'Working on my chest freezer of leftovers. Bring containers.',
-    'Introvert with excellent taste in men. Prove me right.',
-    'I will remember your birthday and your coffee order.',
-    'Kisumu energy. Fish for dinner, lake breeze after.',
-    'Fashion when I feel like it, hoodie when I do not.',
-    'Looking for a best friend I can also kiss.',
-    'Weekend market, then coffee, then see what happens.',
-    'I do not chase. I attract. And I cook.',
-    'Runner. I am slow but I finish. Same energy for relationships.',
-    'Spoken word nights. Come listen with me.',
-    'I keep plants alive and plants keep me honest.',
-    'Ask me about my trip to Watamu. I will show photos.',
-    'Baking stress-relief cookies for the office again.',
-    'Old soul. Highlife and cool evenings.',
-    'I like my men like my tea: strong and not bitter.',
-    'Mama mboga of my own destiny.',
-    'Sunday meal prep looking for a sous-chef.',
-    'Dance when nobody is watching. Also when they are.',
-    'Direct, warm, slightly chaotic. You will never be bored.',
-    'I believe in second dates and good lighting.',
-    'Here for long walks and longer conversations.',
-    'Analyst by weekday, thrill-seeker by weekend.',
-    'I will make you playlist for every mood.',
-    'Looking for kindness first. Attraction second. Luggage never.',
-    'Chapati night is sacred. Respect it.',
-    'Gentle heart, sharp mind, terrible at waiting.',
-    'I travel light and laugh heavy.',
-    'Surprise me with food and we are good.',
-    'I take my coffee black and my men honest.',
-    'Karaoke in the car is non-negotiable.',
-    'Beach over mountains. Tired over lies.',
-    'I am building a quiet life with loud joy in it.',
-    'Curly hair, full schedule, open heart.',
-    'Ask me anything except my body count.',
-    'I want a love that feels like home-cooked food.',
-    'Weekend farmer market and a good film. That is a date.',
-    'I work hard so we can play harder. Responsibly.',
-    'Honesty is my love language. The rest is negotiable.',
-    'Looking for chemistry and consistency.',
-    'I will drive if you navigate. Teamwork.',
-    'Street food critic in my spare time.',
-    'I believe couples who laugh together last.',
-    'Soft heart. I cry at ads sometimes.',
-    'Bring me a book and I am yours forever.',
-    'I want someone who texts first sometimes.',
-    'Swahili food, coastal breeze, good company.',
-    'Ambitious, warm, and done with games.',
-    'I smile at strangers and mean it.',
-    'Looking for a real one in a fake world.',
-    'Gym girl who also loves cake. Balance.',
-    'I keep plants and boundaries healthy.',
-    'Here for a best friend with benefits of respect.',
-    'I take photos of food more than people.',
-    'Quiet confidence. Loud laugh.',
-    'Let us skip the small talk and talk about dreams.',
-    'I love a man with a plan and a joke.',
-    'Sundays are for family and ugali.',
-    'I dance while cooking. Safety hazard included.',
-    'Looking for effort, not perfection.',
-    'I will remember how you like your tea.',
-    'Energy matches only. If you are dry, keep scrolling.',
-    'Music, food, and peace. That is my brand.',
-    'I am the friend who actually replies.',
-    'Born curious, raised kind, still learning.',
-    'Looking for someone to spoil me with attention.',
-    'Road trips and wrong turns are fine by me.',
-    'I cry at happy endings. You have been warned.',
-    'My love language is acts of service and snacks.',
-    'Here for a man who knows what he wants.',
-    'I make a living and a life. Join both.',
-    'Romantic but realistic. Swipe if that sounds like you.',
-    'I will cook if you clean. Fair trade.',
-    'Looking for laughter that turns into forever.',
 ]
 
-cities = [
-    ('Nairobi', '2 km away'), ('Nairobi', '5 km away'), ('Mombasa', '8 km away'),
-    ('Kisumu', '7 km away'), ('Nakuru', '4 km away'), ('Thika', '12 km away'),
-    ('Eldoret', '6 km away'), ('Nairobi', '3 km away'), ('Nairobi', '9 km away'),
-    ('Meru', '5 km away'), ('Nairobi', '1 km away'), ('Mombasa', '15 km away'),
-]
-
-interest_pool = [
-    ['Music', 'Food', 'Travel'], ['Books', 'Fitness', 'Movies'], ['Art', 'Travel', 'Food'],
-    ['Food', 'Church', 'Music'], ['Football', 'Tech', 'Music'], ['Fitness', 'Food', 'Travel'],
-    ['Music', 'Books', 'Movies'], ['Tech', 'Football', 'Coffee'], ['Fashion', 'Food', 'Art'],
-    ['Hiking', 'Photography', 'Music'], ['Cooking', 'Family', 'Church'], ['Dance', 'Movies', 'Food'],
-]
-
-# Distinct bios cycle without repeating last
-bio_idx = 0
 entries = []
 for i, m in enumerate(manifest):
-    name, gender, age, home = names[i % len(names)]
-    # keep names unique-ish
+    name = names[i % len(names)]
     if i >= len(names):
-        name = f"{name} {i // len(names) + 1}"
+        name = f'{name} {i // len(names) + 1}'
+    age = ages[i % len(ages)]
     city, dist = cities[i % len(cities)]
-    bio = bios[bio_idx % len(bios)]
-    bio_idx += 1
-    interests = interest_pool[i % len(interest_pool)]
+    bio = bios[i % len(bios)]
+    interests = interests_pool[i % len(interests_pool)]
+    b = bank(i, base_brains[i % len(base_brains)])
     photos = [m['file']]
-    # second photo if we have another nearby file for multi-shot feel
-    if i + 1 < len(manifest) and (i % 3 == 0):
+    if i % 3 == 0 and i + 1 < len(manifest):
         photos.append(manifest[i + 1]['file'])
-    verified = (i % 4 != 3)
+    verified = (i % 5 != 4)
 
-    entries.append(f"""  {{
-    uid: 'wa-{i + 1:03d}',
-    name: {name!r},
-    age: {age},
-    gender: {gender!r},
-    bio: {bio!r},
-    photos: {photos!r},
-    location: {{ city: {city!r}, distanceLabel: {dist!r} }},
-    interests: {interests!r},
-    verified: {str(verified).lower()},
-  }},""")
+    entries.append('  {')
+    entries.append(f'    uid: {json.dumps(f"mem-{i + 1:03d}")},')
+    entries.append(f'    name: {json.dumps(name)},')
+    entries.append(f'    age: {age},')
+    entries.append("    gender: 'female',")
+    entries.append(f'    bio: {json.dumps(bio)},')
+    entries.append(f'    photos: {json.dumps(photos)},')
+    entries.append(f'    location: {{ city: {json.dumps(city)}, distanceLabel: {json.dumps(dist)} }},')
+    entries.append(f'    interests: {json.dumps(interests)},')
+    entries.append(f'    verified: {"true" if verified else "false"},')
+    entries.append('    brain: {')
+    entries.append(f'      voice: {json.dumps(b["voice"])},')
+    entries.append(f'      humor: {json.dumps(b["humor"])},')
+    entries.append(f'      never: {json.dumps(b["never"])},')
+    entries.append(f'      style: {json.dumps(b["style"])},')
+    entries.append(f'      quirk: {json.dumps(b["quirk"])},')
+    entries.append(f'      openers: {json.dumps(b["openers"], ensure_ascii=False)},')
+    entries.append(f'      replies: {json.dumps(b["replies"], ensure_ascii=False)},')
+    entries.append(f'      questions: {json.dumps(b["questions"], ensure_ascii=False)},')
+    entries.append(f'      topics: {json.dumps(b["topics"])},')
+    entries.append('    },')
+    entries.append('  },')
 
-src = '''import type { MatchUser } from '../store';
+src = """import type { MatchUser } from '../store';
 
-export type SeedProfile = MatchUser;
+export type MemberBrain = {
+  voice: string;
+  humor: string;
+  never: string;
+  style: string;
+  quirk: string;
+  openers: string[];
+  replies: string[];
+  questions: string[];
+  topics: string[];
+};
+
+export type SeedProfile = MatchUser & {
+  gender: 'male' | 'female' | 'other';
+  location: { city: string; distanceLabel?: string };
+  interests: string[];
+  verified?: boolean;
+  brain?: MemberBrain;
+};
 
 /**
- * Real-photo demo members (WhatsApp source packs, re-encoded at high JPEG quality).
- * Used so the swipe deck never feels empty when live Firestore is thin.
+ * Deck members. Each entry carries its own brain so chat lines never collapse into one shared bot voice.
  */
 export const SEED_PROFILES: SeedProfile[] = [
-''' + '\n'.join(entries) + '''
+""" + '\n'.join(entries) + """
 ];
 
 export function filterSeeds(
@@ -290,8 +437,12 @@ export function filterSeeds(
     return true;
   });
 }
-'''
+
+export function findMember(uid: string): SeedProfile | undefined {
+  return SEED_PROFILES.find((p) => p.uid === uid);
+}
+"""
 
 Path(r'C:\Users\ADMIN\XiaomiMiMoProjects\MingleKe\src\lib\seedProfiles.ts').write_text(src)
 print('profiles', len(entries))
-print('bytes', len(src))
+print('brain packs', len(base_brains), 'rotated + name-tagged per person')
