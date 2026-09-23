@@ -240,7 +240,8 @@ export default function DiscoveryScreen() {
         </div>
       )}
 
-      <div className="flex-1 relative min-h-0 p-2 sm:p-3">
+      {/* Photo plate — name only on the image */}
+      <div className="flex-1 relative min-h-0 p-2 sm:p-3 pb-0">
         <AnimatePresence>
           {currentProfile ? (
             <motion.div
@@ -255,7 +256,7 @@ export default function DiscoveryScreen() {
                 else if (info.offset.x < -100) handleSwipe('left');
                 else x.set(0);
               }}
-              className="absolute inset-2 sm:inset-3 cursor-grab active:cursor-grabbing"
+              className="absolute inset-2 sm:inset-3 bottom-0 cursor-grab active:cursor-grabbing"
             >
               <div className="w-full h-full plate relative select-none">
                 <img
@@ -271,8 +272,8 @@ export default function DiscoveryScreen() {
                 />
 
                 <div className="absolute inset-0 flex">
-                  <button type="button" aria-label="Previous photo" className="w-1/2 h-[72%]" onClick={(e) => { e.stopPropagation(); handlePhotoClick('prev'); }} />
-                  <button type="button" aria-label="Next photo" className="w-1/2 h-[72%]" onClick={(e) => { e.stopPropagation(); handlePhotoClick('next'); }} />
+                  <button type="button" aria-label="Previous photo" className="w-1/2 h-[78%]" onClick={(e) => { e.stopPropagation(); handlePhotoClick('prev'); }} />
+                  <button type="button" aria-label="Next photo" className="w-1/2 h-[78%]" onClick={(e) => { e.stopPropagation(); handlePhotoClick('next'); }} />
                 </div>
 
                 {photos.length > 1 && (
@@ -291,43 +292,23 @@ export default function DiscoveryScreen() {
                 </motion.div>
 
                 <div
-                  className="absolute inset-x-0 bottom-0 h-2/5 z-10 pointer-events-none"
-                  style={{ background: 'linear-gradient(to top, #14110E 5%, transparent)' }}
+                  className="absolute inset-x-0 bottom-0 h-28 z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(to top, #14110E 30%, transparent)' }}
                 />
 
-                {/* nameplate signature */}
-                <div className="absolute inset-x-2 sm:inset-x-3 bottom-2 sm:bottom-3 z-30">
-                  <div className="flex items-end justify-between gap-2 mb-1.5">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="nameplate text-lg sm:text-2xl md:text-[28px] max-w-full truncate">
-                        {currentProfile.name}
-                        {currentProfile.age ? `, ${currentProfile.age}` : ''}
-                      </h2>
-                      <p className="type-meta mt-1 truncate">
-                        {currentProfile.location?.city || 'Nearby'}
-                        {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
-                      </p>
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleReport(currentProfile.uid); }}
-                      className="type-meta border border-line bg-ink/80 px-2 py-2 hover:text-hibiscus hover:border-hibiscus min-h-[40px] shrink-0"
-                      aria-label="Report"
-                    >
-                      <Flag size={14} />
-                    </button>
-                  </div>
-                  {currentProfile.bio && (
-                    <p className="text-sm text-bone leading-snug line-clamp-2 mb-1">{currentProfile.bio}</p>
-                  )}
-                  {currentProfile.interests?.length ? (
-                    <div className="flex flex-wrap gap-1">
-                      {currentProfile.interests.slice(0, 3).map((tag) => (
-                        <span key={tag} className="type-meta border border-line bg-ink/85 px-1.5 py-0.5 truncate max-w-[7rem]">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
+                {/* nameplate only — details live below the plate */}
+                <div className="absolute inset-x-2 sm:inset-x-3 bottom-2 sm:bottom-3 z-30 flex items-end justify-between gap-2">
+                  <h2 className="nameplate text-lg sm:text-2xl md:text-[28px] max-w-full truncate">
+                    {currentProfile.name}
+                    {currentProfile.age ? `, ${currentProfile.age}` : ''}
+                  </h2>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleReport(currentProfile.uid); }}
+                    className="type-meta border border-line bg-ink/80 px-2 py-2 hover:text-hibiscus hover:border-hibiscus min-h-[40px] shrink-0"
+                    aria-label="Report"
+                  >
+                    <Flag size={14} />
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -348,11 +329,34 @@ export default function DiscoveryScreen() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute bottom-14 sm:bottom-16 inset-x-0 px-3 sm:px-4 flex items-center justify-between gap-3 z-40">
+      {/* Details strip — never covered by Pass/Like */}
+      {currentProfile && (
+        <div className="shrink-0 page-pad py-2.5 border-t border-line">
+          <p className="type-meta truncate mb-1">
+            {currentProfile.location?.city || 'Nearby'}
+            {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
+          </p>
+          {currentProfile.bio && (
+            <p className="text-sm text-bone leading-snug line-clamp-2 mb-1.5">{currentProfile.bio}</p>
+          )}
+          {currentProfile.interests?.length ? (
+            <div className="flex flex-wrap gap-1">
+              {currentProfile.interests.slice(0, 4).map((tag) => (
+                <span key={tag} className="type-meta border border-line bg-ink-soft px-1.5 py-0.5">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {/* Actions in flow — sits under the details, not on top of them */}
+      <div className="shrink-0 page-pad py-2.5 flex items-center justify-between gap-3 border-t border-line mb-14">
         <button
           onClick={() => handleSwipe('left')}
           disabled={swiping || !currentProfile}
-          className="type-display h-12 sm:h-14 px-4 sm:px-6 border border-line bg-ink text-bone hover:border-hibiscus hover:text-hibiscus disabled:opacity-40 min-w-[72px] sm:min-w-[88px]"
+          className="type-display h-12 sm:h-14 px-5 sm:px-6 border border-line bg-ink text-bone hover:border-hibiscus hover:text-hibiscus disabled:opacity-40 min-w-[80px] sm:min-w-[96px]"
           aria-label="Pass"
         >
           Pass
@@ -360,7 +364,7 @@ export default function DiscoveryScreen() {
         <button
           onClick={() => handleSwipe('right')}
           disabled={swiping || !currentProfile}
-          className="btn-primary h-12 sm:h-14 min-w-[100px] sm:min-w-[112px] !w-auto px-5 sm:px-6"
+          className="btn-primary h-12 sm:h-14 min-w-[104px] sm:min-w-[120px] !w-auto px-5 sm:px-6"
           aria-label="Like"
         >
           Like
