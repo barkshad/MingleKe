@@ -9,6 +9,11 @@ export interface MatchUser {
   bio?: string;
   age?: number;
   lastActive?: unknown;
+  /** Optional UI extras used by seed/demo cards */
+  gender?: string;
+  location?: { city: string; distanceLabel?: string };
+  interests?: string[];
+  verified?: boolean;
 }
 
 export interface Match {
@@ -121,6 +126,15 @@ export async function fetchDiscoveryProfiles(
       photos: Array.isArray(u.photos) ? u.photos.filter(Boolean) : [],
       bio: u.bio,
       age: u.age,
+      gender: u.gender,
+      location: u.location
+        ? {
+            city: u.location.city || 'Nearby',
+            distanceLabel: u.location.city && u.location.city !== 'Nearby' ? undefined : 'Nearby',
+          }
+        : undefined,
+      interests: Array.isArray(u.interests) ? u.interests : [],
+      verified: u.paymentStatus === 'completed',
     });
   });
 

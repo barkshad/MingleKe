@@ -16,7 +16,7 @@ export function ProtectedRoute() {
   if (loading) return <FullScreenLoader />;
 
   if (!user) {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   if (!profile?.onboarded) {

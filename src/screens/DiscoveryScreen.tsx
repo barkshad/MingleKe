@@ -17,8 +17,13 @@ import Navigation from '../components/Navigation';
 import { Avatar } from '../components/Avatar';
 import { cn, PLACEHOLDER_AVATAR } from '../lib/utils';
 import { fetchDiscoveryProfiles, getSwipedUids, type MatchUser } from '../store';
+import { filterSeeds, type SeedProfile } from '../lib/seedProfiles';
 import { useToast } from '../components/Toast';
+import { FreeCountdown } from '../components/FreeCountdown';
+import { isFreeWindow } from '../lib/promo';
 import { useNavigate } from 'react-router-dom';
+
+const isSeedUid = (uid: string) => uid.startsWith('seed-');
 
 export default function DiscoveryScreen() {
   const [profiles, setProfiles] = useState<MatchUser[]>([]);
@@ -46,23 +51,48 @@ export default function DiscoveryScreen() {
     setLoading(true);
     setError('');
     try {
+      const localPassed = JSON.parse(localStorage.getItem(`mingleke-swiped-${user.uid}`) || '[]') as string[];
       const swiped = await getSwipedUids(user.uid);
-      const exclude = [...swiped.liked, ...swiped.passed];
-      const list = await fetchDiscoveryProfiles(
-        user.uid,
-        {
-          interestedIn: currentUserProfile.interestedIn || 'everyone',
-          minAge,
-          maxAge,
-        },
-        exclude
-      );
-      setProfiles(list);
+      const exclude = [...swiped.liked, ...swiped.passed, ...localPassed];
+      const filters = {
+        interestedIn: currentUserProfile.interestedIn || ('everyone' as const),
+        minAge,
+        maxAge,
+      };
+
+      let list: MatchUser[] = [];
+      try {
+        list = await fetchDiscoveryProfiles(user.uid, filters, exclude);
+      } catch (err) {
+        console.error(err);
+      }
+
+      // Always backfill with realistic demo members when the live pool is thin
+      const liveUids = new Set(list.map((p) => p.uid));
+      const seeds = filterSeeds(filters, [...exclude, ...liveUids]).filter((s) => {
+        if (filters.interestedIn === 'men') return s.gender === 'male';
+        if (filters.interestedIn === 'women') return s.gender === 'female';
+        return true;
+      });
+
+      // Interleave: live people first, then demo members, capped so the deck feels full
+      const merged = [...list, ...seeds].slice(0, 24);
+      setProfiles(merged);
       setCurrentIndex(0);
       setActivePhotoIndex(0);
     } catch (err: any) {
       console.error(err);
       setError('Could not load people right now.');
+      // Offline / API failure: still show demo deck so the app is usable
+      const seeds = filterSeeds(
+        {
+          interestedIn: currentUserProfile.interestedIn || 'everyone',
+          minAge,
+          maxAge,
+        },
+        []
+      );
+      setProfiles(seeds);
     } finally {
       setLoading(false);
     }
@@ -116,35 +146,55 @@ export default function DiscoveryScreen() {
     setSwiping(true);
     x.set(direction === 'right' ? 320 : -320);
 
-    try {
-      await addDoc(collection(db, 'likes'), {
-        senderId: user.uid,
-        receiverId: swipedUser.uid,
-        action: direction === 'right' ? 'like' : 'pass',
-        createdAt: serverTimestamp(),
-      });
+    const remember = (uid: string) => {
+      try {
+        const key = `mingleke-swiped-${user.uid}`;
+        const prev = JSON.parse(localStorage.getItem(key) || '[]') as string[];
+        localStorage.setItem(key, JSON.stringify([...prev, uid]));
+      } catch {
+        // ignore quota
+      }
+    };
 
-      if (direction === 'right') {
-        const mutual = await getDocs(
-          query(
-            collection(db, 'likes'),
-            where('senderId', '==', swipedUser.uid),
-            where('receiverId', '==', user.uid),
-            where('action', '==', 'like')
-          )
-        );
-        if (!mutual.empty) {
-          const newMatchId = [user.uid, swipedUser.uid].sort().join('_');
-          await setDoc(
-            doc(db, 'matches', newMatchId),
-            {
-              users: [user.uid, swipedUser.uid],
-              matchedAt: serverTimestamp(),
-            },
-            { merge: true }
-          );
+    try {
+      remember(swipedUser.uid);
+
+      if (isSeedUid(swipedUser.uid)) {
+        // Demo members: local like/pass, optional playful match
+        if (direction === 'right' && Math.random() < 0.45) {
           setMatchFound(swipedUser);
-          setMatchId(newMatchId);
+          setMatchId(`demo-${swipedUser.uid}`);
+        }
+      } else {
+        await addDoc(collection(db, 'likes'), {
+          senderId: user.uid,
+          receiverId: swipedUser.uid,
+          action: direction === 'right' ? 'like' : 'pass',
+          createdAt: serverTimestamp(),
+        });
+
+        if (direction === 'right') {
+          const mutual = await getDocs(
+            query(
+              collection(db, 'likes'),
+              where('senderId', '==', swipedUser.uid),
+              where('receiverId', '==', user.uid),
+              where('action', '==', 'like')
+            )
+          );
+          if (!mutual.empty) {
+            const newMatchId = [user.uid, swipedUser.uid].sort().join('_');
+            await setDoc(
+              doc(db, 'matches', newMatchId),
+              {
+                users: [user.uid, swipedUser.uid],
+                matchedAt: serverTimestamp(),
+              },
+              { merge: true }
+            );
+            setMatchFound(swipedUser);
+            setMatchId(newMatchId);
+          }
         }
       }
     } catch (err) {
@@ -187,6 +237,12 @@ export default function DiscoveryScreen() {
         </button>
       </header>
 
+      {isFreeWindow() && (
+        <div className="mb-3">
+          <FreeCountdown compact />
+        </div>
+      )}
+
       <div className="flex-1 relative">
         <AnimatePresence>
           {currentProfile ? (
@@ -205,10 +261,14 @@ export default function DiscoveryScreen() {
               className="absolute inset-0 cursor-grab active:cursor-grabbing"
             >
               <div className="w-full h-full card-container relative select-none">
-                <Avatar
-                  src={photos[activePhotoIndex]}
+                <img
+                  src={photos[activePhotoIndex] || PLACEHOLDER_AVATAR}
                   alt={currentProfile.name}
-                  className="w-full h-full absolute inset-0 pointer-events-none"
+                  draggable={false}
+                  className="w-full h-full absolute inset-0 object-cover object-top select-none pointer-events-none bg-line"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_AVATAR;
+                  }}
                 />
 
                 <div className="absolute inset-0 flex">
@@ -259,14 +319,22 @@ export default function DiscoveryScreen() {
                   Nope
                 </motion.div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/25 to-transparent pointer-events-none" />
 
-                <div className="absolute inset-x-0 bottom-0 p-5 text-cream space-y-1 z-30">
+                <div className="absolute inset-x-0 bottom-0 p-5 text-cream space-y-1.5 z-30">
                   <div className="flex items-end justify-between gap-2">
-                    <h2 className="text-3xl font-bold">
-                      {currentProfile.name}
-                      {currentProfile.age ? `, ${currentProfile.age}` : ''}
-                    </h2>
+                    <div className="min-w-0">
+                      <h2 className="text-3xl font-bold drop-shadow-sm">
+                        {currentProfile.name}
+                        {currentProfile.age ? `, ${currentProfile.age}` : ''}
+                      </h2>
+                      {(currentProfile.location?.distanceLabel || currentProfile.location?.city) && (
+                        <p className="text-white/85 text-sm mt-0.5 flex items-center gap-1">
+                          {currentProfile.location?.city}
+                          {currentProfile.location?.distanceLabel ? ` · ${currentProfile.location.distanceLabel}` : ''}
+                        </p>
+                      )}
+                    </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -280,6 +348,18 @@ export default function DiscoveryScreen() {
                   </div>
                   {currentProfile.bio && (
                     <p className="text-white/90 text-sm line-clamp-2 pt-1 leading-relaxed">{currentProfile.bio}</p>
+                  )}
+                  {currentProfile.interests && currentProfile.interests.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {currentProfile.interests.slice(0, 4).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/12 border border-white/20 text-white/90 backdrop-blur-sm"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
@@ -371,6 +451,10 @@ export default function DiscoveryScreen() {
                   onClick={() => {
                     const id = matchId;
                     setMatchFound(null);
+                    if (id && id.startsWith('demo-')) {
+                      toast('Demo match — live chat unlocks with real members.', 'info');
+                      return;
+                    }
                     if (id) navigate(`/chat/${id}`);
                     else navigate('/matches');
                   }}

@@ -15,7 +15,9 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { cn, calculateAge, isValidBirthday, formatPhone } from '../lib/utils';
 import { uploadProfilePhoto } from '../lib/upload';
+import { isFreeWindow, freeWindowMsLeft, formatCountdown, freeWindowTextLabel } from '../lib/promo';
 import { Avatar } from '../components/Avatar';
+import { FreeCountdown } from '../components/FreeCountdown';
 import { useToast } from '../components/Toast';
 
 type OnboardingData = {
@@ -55,8 +57,10 @@ export default function OnboardingScreen() {
   const navigate = useNavigate();
   const toast = useToast((s) => s.show);
 
-  const totalSteps = data.gender === 'female' ? 9 : 8;
-  const needsPayment = data.gender === 'female';
+  const freeNow = isFreeWindow();
+  const needsPayment = !freeNow && data.gender === 'female';
+  // 1–7 profile, 8 payment or free unlock, 9 welcome
+  const totalSteps = freeNow || needsPayment ? 9 : 8;
   const age = useMemo(() => calculateAge(data.birthday), [data.birthday]);
   const photoCount = data.photos.filter(Boolean).length;
 
@@ -65,7 +69,7 @@ export default function OnboardingScreen() {
 
   const handleComplete = async () => {
     if (!user) return;
-    if (needsPayment && !paymentDone && data.gender === 'female') {
+    if (needsPayment && !paymentDone) {
       toast('Complete verification payment first.', 'error');
       return;
     }
@@ -81,7 +85,7 @@ export default function OnboardingScreen() {
         interests: data.interests,
         age,
         onboarded: true,
-        paymentStatus: needsPayment ? 'completed' : 'none',
+        paymentStatus: freeNow || needsPayment ? 'completed' : 'none',
         maxDistanceKm: 50,
         ageRange: { min: 18, max: 45 },
         showMe: data.interestedIn as 'men' | 'women' | 'everyone',
@@ -238,6 +242,11 @@ export default function OnboardingScreen() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-8 pt-10 pb-8 flex flex-col">
+        {freeNow && step < 9 && (
+          <div className="mb-5">
+            <FreeCountdown compact />
+          </div>
+        )}
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -523,15 +532,41 @@ export default function OnboardingScreen() {
                 </div>
               </div>
 
+              {freeNow && (
+                <div className="glass-panel border border-amber/30 rounded-2xl p-4 space-y-1">
+                  <p className="text-amber font-bold text-sm">Free launch — no payment needed</p>
+                  <p className="text-mist text-xs leading-relaxed">
+                    Full access is open to everyone until {freeWindowTextLabel()}.
+                  </p>
+                </div>
+              )}
               <button
                 disabled={!data.bio.trim()}
                 onClick={() => {
-                  // jump to payment/finish depending on gender
-                  if (needsPayment) nextStep();
+                  if (needsPayment || freeNow) nextStep();
                   else setStep(9);
                 }}
                 className="btn-primary"
               >
+                Continue
+              </button>
+            </motion.div>
+          )}
+
+          {step === 8 && freeNow && (
+            <motion.div
+              key="step8-free"
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              className="space-y-6"
+            >
+              <h1 className="text-4xl font-bold">You are in — free</h1>
+              <FreeCountdown />
+              <p className="text-mist text-base leading-relaxed">
+                Verification fees are paused this week. Finish setup and start mingling.
+              </p>
+              <button onClick={nextStep} className="btn-primary">
                 Continue
               </button>
             </motion.div>

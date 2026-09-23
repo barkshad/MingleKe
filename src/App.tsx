@@ -5,6 +5,7 @@ import { ProtectedRoute, PublicRoute } from './components/Routes';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PwaPrompt } from './components/PwaPrompt';
 import { ToastHost } from './components/Toast';
+import LandingPage from './screens/LandingPage';
 import LandingScreen from './screens/LandingScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import DiscoveryScreen from './screens/DiscoveryScreen';
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/welcome" element={<LandingScreen />} />
               </Route>
 
+              <Route path="/home" element={<LandingPage />} />
               <Route path="/onboarding" element={<OnboardingScreen />} />
 
               <Route element={<ProtectedRoute />}>
@@ -41,7 +43,7 @@ export default function App() {
                 <Route path="/profile/safety" element={<SafetyScreen />} />
               </Route>
 
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
           </div>
         </BrowserRouter>

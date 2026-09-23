@@ -41,7 +41,7 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/welcome');
+      navigate('/home');
     } catch {
       toast('Could not log out. Try again.', 'error');
     }

@@ -9,6 +9,7 @@ import {
 import { auth } from '../firebase';
 import { useNavigate, Link } from 'react-router-dom';
 import { friendlyAuthError } from '../lib/utils';
+import { FreeCountdown } from '../components/FreeCountdown';
 import { useToast } from '../components/Toast';
 
 type View = 'welcome' | 'email-login' | 'email-signup' | 'reset';
@@ -84,6 +85,10 @@ export default function LandingScreen() {
         >
           Meet people nearby. Keep it real.
         </motion.p>
+      </div>
+
+      <div className="w-full max-w-sm mx-auto mb-4">
+        <FreeCountdown />
       </div>
 
       <div className="space-y-4 mb-6 w-full max-w-sm mx-auto">
