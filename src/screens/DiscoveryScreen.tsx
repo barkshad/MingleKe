@@ -75,8 +75,8 @@ export default function DiscoveryScreen() {
         return true;
       });
 
-      // Interleave: live people first, then demo members, capped so the deck feels full
-      const merged = [...list, ...seeds].slice(0, 24);
+      // Interleave: live people first, then demo members so the deck stays full
+      const merged = [...list, ...seeds];
       setProfiles(merged);
       setCurrentIndex(0);
       setActivePhotoIndex(0);

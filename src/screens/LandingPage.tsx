@@ -95,7 +95,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-16 h-20 rounded-2xl overflow-hidden bg-line flex items-center justify-center">
                 <img
-                  src="/seed/w1.jpg"
+                  src="/seed/wa/p01.jpg"
                   alt=""
                   className="w-full h-full object-cover object-top"
                   onError={(e) => {
@@ -104,7 +104,7 @@ export default function LandingPage() {
                 />
               </div>
               <div>
-                <p className="font-bold text-lg">Akinyi, 24</p>
+                <p className="font-bold text-lg">Zawadi, 24</p>
                 <p className="text-mist text-sm">Nairobi · 2 km away</p>
               </div>
             </div>

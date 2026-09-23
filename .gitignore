@@ -6,3 +6,12 @@ coverage/
 *.log
 .env*
 !.env.example
+wa-extract/
+public/seed/w1.jpg
+public/seed/w2.jpg
+public/seed/w3.jpg
+public/seed/w4.jpg
+public/seed/m1.jpg
+public/seed/m2.jpg
+public/seed/m3.jpg
+public/seed/m4.jpg
