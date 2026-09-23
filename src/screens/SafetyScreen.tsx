@@ -7,22 +7,22 @@ const tips = [
   {
     icon: HeartHandshake,
     title: 'Meet in public first',
-    body: 'Choose a busy café or restaurant for the first meetup. Tell a friend where you will be.',
+    body: 'Pick a busy café. Tell a friend where you will be.',
   },
   {
     icon: MapPin,
-    title: 'Share plans, not live location',
-    body: 'Send your plans to someone you trust. Do not share home or work addresses early.',
+    title: 'Skip home and work addresses',
+    body: 'Share plans with a friend, not your live location with a stranger.',
   },
   {
     icon: Flag,
-    title: 'Report anything off',
-    body: 'Use the flag on any profile for spam, harassment, or fake accounts. We review reports.',
+    title: 'Report bad behaviour',
+    body: 'Use the flag on any profile. We read every report.',
   },
   {
     icon: ShieldAlert,
-    title: 'Money is a red flag',
-    body: 'Never send money, airtime, or M-Pesa to someone you only know from chat.',
+    title: 'Money requests are a scam',
+    body: 'Never send cash, airtime, or M-Pesa to a match.',
   },
 ];
 
@@ -44,7 +44,7 @@ export default function SafetyScreen() {
 
       <div className="flex-1 overflow-y-auto page-pad py-5 space-y-4 pb-24 min-h-0">
         <p className="text-mist text-sm leading-relaxed">
-          MingleKE is built for real connections. Your safety matters more than any match.
+          Keep it real. Keep it safe.
         </p>
 
         {tips.map((tip) => (

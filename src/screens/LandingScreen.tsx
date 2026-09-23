@@ -94,7 +94,7 @@ export default function LandingScreen() {
                 Create account
               </button>
               <p className="type-meta mt-3 normal-case tracking-normal font-sans text-xs leading-relaxed">
-                Inspect mode is on: login skips Firebase and opens the full app so you can look around.
+                Tap Log in to look around. No password needed.
               </p>
             </motion.div>
           )}

@@ -10,17 +10,17 @@ const steps = [
   {
     n: '01',
     title: 'Make a plate',
-    body: 'Three photos, a short bio, your town. That is the whole setup.',
+    body: 'Photos, a short bio, your town.',
   },
   {
     n: '02',
-    title: 'Run the deck',
-    body: 'Pass or like. When both of you like, you get a line to talk on.',
+    title: 'Swipe',
+    body: 'Pass or like. If you both like, you match.',
   },
   {
     n: '03',
-    title: 'Meet in daylight',
-    body: 'Public place first. Tell a friend. Report anyone who gets weird.',
+    title: 'Chat',
+    body: 'Meet in public first. Report anyone who gets weird.',
   },
 ];
 
@@ -49,7 +49,7 @@ export default function LandingPage() {
           <span className="text-hibiscus">KE</span>
         </h1>
         <p className="text-bone text-base leading-snug max-w-[32ch] mb-5">
-          The deck shifts. Pick one and open the real thing.
+          Swipe. Match. Chat. That’s it.
         </p>
 
         {free && (
@@ -117,10 +117,9 @@ export default function LandingPage() {
 
       {/* Install */}
       <section className="page-pad py-8 border-b border-line">
-        <h2 className="fluid-display-sm mb-3">Put it on your home screen</h2>
+        <h2 className="fluid-display-sm mb-3">Add to home screen</h2>
         <p className="text-bone-dim text-sm leading-relaxed mb-4">
-          Android Chrome: menu → Add to Home screen. iPhone Safari: Share → Add to Home Screen.
-          Desktop browsers show an install icon in the address bar.
+          In your browser menu, choose <strong className="text-bone">Add to Home screen</strong> (or Install). Then open it like an app.
         </p>
         <button type="button" onClick={openApp} className="btn-primary">
           Get the app
@@ -132,9 +131,7 @@ export default function LandingPage() {
           <p className="type-meta text-hibiscus mb-2">Free until {freeWindowTextLabel()}</p>
         )}
         <p className="fluid-display-sm mb-4 leading-tight">
-          Open the deck.
-          <br />
-          Start a conversation.
+          Open the deck. Say hi.
         </p>
         <button type="button" onClick={openApp} className="btn-secondary">
           Start mingling
