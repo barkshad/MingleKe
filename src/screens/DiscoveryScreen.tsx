@@ -398,13 +398,14 @@ export default function DiscoveryScreen() {
               className="absolute inset-0"
               style={{ background: 'linear-gradient(to top, #14110E 35%, transparent)' }}
             />
-            <motion.div initial={{ y: 24 }} animate={{ y: 0 }} className="relative z-10 p-6 space-y-4">
-              <p className="type-meta">It’s a match</p>
-              <h2 className="type-display text-5xl leading-none">
-                You +<br />
-                <span className="text-hibiscus">{matchFound.name}</span>
+            <motion.div initial={{ y: 24 }} animate={{ y: 0 }} className="relative z-10 p-6 space-y-3">
+              <p className="type-meta tracking-[0.3em]">Mutual</p>
+              <h2 className="type-display text-5xl sm:text-6xl leading-[0.9]">
+                You matched
+                <br />
+                <span className="text-hibiscus uppercase">{matchFound.name}</span>
               </h2>
-              <div className="flex flex-col gap-2 max-w-md">
+              <div className="flex flex-col gap-2 max-w-md pt-3">
                 <button
                   onClick={() => {
                     const id = matchId;

@@ -9,13 +9,10 @@ function pick<T>(arr: T[], last?: T): T {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-/** Apply Valexy’s real typo words without making every line identical. */
 function valexyTypos(line: string): string {
   let out = line;
   for (const [from, to] of VALEXY.typos) {
-    if (Math.random() < 0.45) {
-      out = out.replace(new RegExp(`\\b${from}\\b`, 'i'), to);
-    }
+    if (Math.random() < 0.4) out = out.replace(new RegExp(`\\b${from}\\b`, 'i'), to);
   }
   return out;
 }
@@ -23,18 +20,10 @@ function valexyTypos(line: string): string {
 function humanize(line: string): string {
   let out = valexyTypos(line.trim());
   const r = Math.random();
-
-  // trailing dots like "girl.." / "just for now..."
-  if (r < 0.3 && !/\.{2,}$/.test(out) && !out.endsWith('..')) {
-    if (out.length > 30) out = `${out}...`;
-    else out = `${out}..`;
+  if (r < 0.28 && !/\.{2,}$/.test(out)) {
+    out = out.length > 30 ? `${out}...` : `${out}..`;
   }
-  // occasional mid-thought ellipsis already in corpus; add a soft trail
-  if (r > 0.8 && out.length > 20 && !out.includes('...')) {
-    const cut = out.lastIndexOf(' ');
-    if (cut > 12) out = `${out.slice(0, cut)}...`;
-  }
-  if (r > 0.92) out = out.toUpperCase();
+  if (r > 0.93) out = out.toUpperCase();
   return out;
 }
 
@@ -50,10 +39,17 @@ function brainOf(seed?: SeedProfile): MemberBrain {
   );
 }
 
-/**
- * Combine her private brain banks with the shared Valexy corpus.
- * Soft vs spicy tracks how deep the chat already is.
- */
+function heatLevel(turnIndex: number, text: string): number {
+  const hot =
+    /\b(nasty|daddy|master|good girl|wild|ride|moan|location|sexy|hot|pussy|limit|dare|nsfw)\b/i.test(
+      text
+    );
+  if (hot || turnIndex >= 8) return 4;
+  if (turnIndex >= 5) return 3;
+  if (turnIndex >= 2) return 2;
+  return 1;
+}
+
 export function replyFromBrain(
   seed: SeedProfile | undefined,
   userText: string,
@@ -62,69 +58,30 @@ export function replyFromBrain(
 ): string {
   const b = brainOf(seed);
   const text = userText.toLowerCase();
-  const deep = turnIndex >= 4 || /nasty|daddy|ride|moan|wild|location|kiss|touch/.test(text);
+  const heat = heatLevel(turnIndex, text);
 
   if (turnIndex === 0) return humanize(pick([...VALEXY.openers, ...b.openers], lastLine));
 
   if (/\b(sad|scared|alone|cry|thunder|lightning|ex|tired|stress|rough)\b/.test(text)) {
     return humanize(
-      pick(
-        [
-          'ooh sorry about that 😔',
-          'i am here for you',
-          'Beb...come here 🫣',
-          'you sleep alone? 🥺 I get that',
-          pick(VALEXY.soft),
-        ],
-        lastLine
-      )
+      pick(['ooh sorry about that 😔', 'i am here for you', 'Beb...come here 🫣', 'you sleep alone? 🥺 I get that', pick(VALEXY.soft)], lastLine)
     );
   }
 
   if (/\b(voice|song|sing|music|note|sounds)\b/.test(text)) {
     return humanize(
-      pick(
-        [
-          'the voice 🥵🥵🥵...what did you take for lunch girl..??',
-          'marize🤤🎼',
-          "That's my favourite song tot for life",
-          'send that again...I need it 🫣',
-        ],
-        lastLine
-      )
+      pick(['the voice 🥵🥵🥵...what did you take for lunch girl..??', 'marize🤤🎼', "That's my favourite song tot for life", 'send that again...I need it 🫣'], lastLine)
     );
   }
 
-  if (/\b(love|cute|beautiful|hot|pretty|blush|miss)\b/.test(text)) {
+  if (/\b(love|cute|beautiful|hot|pretty|blush|miss)\b/.test(text) && heat < 3) {
     return humanize(
-      pick(
-        [
-          'Really 😊 you are making me blush',
-          "mmhnh🤫 flatter box 😂",
-          'wayy too sweet...stop it 🫣',
-          "you've completed my day girl..",
-        ],
-        lastLine
-      )
+      pick(['Really 😊 you are making me blush', 'mmhnh🤫 flatter box 😂', 'wayy too sweet...stop it 🫣', "you've completed my day girl.."], lastLine)
     );
   }
 
-  if (/\b(nasty|daddy|master|good girl|wild|ride|moan|location|sexy|hot)\b/.test(text) || deep && Math.random() < 0.35) {
-    return humanize(
-      pick(
-        [
-          'yah🫣...but you are wayy too nastier😘',
-          'I mean for your age😏',
-          'Oky my apologies daddy or should I say master',
-          "Next time you will be saying yeaaa right there my good girl🔞😍",
-          "You're tempting me to push you past your limits, but I'll keep it just for now...",
-          'cant wait',
-          'Same here I’m going so wild right now',
-          'location 🤭',
-        ],
-        lastLine
-      )
-    );
+  if (heat >= 3) {
+    return humanize(pick([...VALEXY.flirty, ...VALEXY.spicy], lastLine));
   }
 
   if (/\b(hi|hey|sasa|niaje|hello)\b/.test(text) && text.length < 24) {
@@ -139,17 +96,16 @@ export function replyFromBrain(
     return humanize(pick([...VALEXY.short, 'go on...', 'and??', 'yah🫣'], lastLine));
   }
 
-  if (Math.random() < 0.28) {
-    return humanize(pick([...VALEXY.questions, ...b.questions], lastLine));
-  }
+  if (Math.random() < 0.25) return humanize(pick([...VALEXY.questions, ...b.questions], lastLine));
 
-  // default: her soft / reaction banks mixed with this person’s brain
-  return humanize(
-    pick(
-      [...VALEXY.reactions, ...VALEXY.soft, ...b.replies],
-      lastLine
-    )
-  );
+  const bank =
+    heat >= 4
+      ? [...VALEXY.spicy, ...VALEXY.flirty, ...b.replies]
+      : heat >= 3
+        ? [...VALEXY.flirty, ...VALEXY.reactions, ...b.replies]
+        : [...VALEXY.reactions, ...VALEXY.soft, ...b.replies];
+
+  return humanize(pick(bank, lastLine));
 }
 
 export function openerFromBrain(seedUid: string): string {
@@ -185,10 +141,10 @@ export async function botReply(
             interests: seed?.interests,
             brain: { ...VALEXY_STYLE, ...(seed?.brain || {}) },
             sampleLines: [
-              ...VALEXY.openers.slice(0, 3),
-              ...VALEXY.soft.slice(0, 3),
+              ...VALEXY.openers.slice(0, 2),
+              ...VALEXY.soft.slice(0, 2),
               ...VALEXY.flirty.slice(0, 2),
-              ...VALEXY.reactions.slice(0, 2),
+              ...VALEXY.spicy.slice(0, 3),
             ],
           },
           history: history.slice(-12),
@@ -197,11 +153,9 @@ export async function botReply(
       },
       7000
     );
-    if (data?.reply && typeof data.reply === 'string') {
-      return humanize(data.reply.slice(0, 400));
-    }
+    if (data?.reply && typeof data.reply === 'string') return humanize(data.reply.slice(0, 500));
   } catch {
-    // local Valexy corpus
+    /* local corpus */
   }
 
   return replyFromBrain(seed, userText, turnIndex, lastBot);
