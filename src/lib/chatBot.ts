@@ -1,94 +1,59 @@
 import { SEED_PROFILES, findMember, type MemberBrain, type SeedProfile } from './seedProfiles';
 import { fetchJsonWithTimeout, isLowBandwidth } from './network';
-
-/**
- * Valexy-style texting patterns: raw, emoji bursts, messy caps, light censoring,
- * Sheng fragments, feelings first. Polished AI cadence is banned.
- */
-
-const VIBE_EMOJI = ['💔', '😂', '🤌', '🥲', '😭', '👀', '💀', '🔥', '❤️', '😌', '🥺', '✨', '🫶'];
-const FILLERS = ['mehn', 'bana', 'kwani', 'sasa', 'wah', 'ai', 'hadi', 'buana'];
-const CENSOR = [
-  ['fuck', 'f*CK'],
-  ['shit', 'sh*t'],
-  ['damn', 'd*mn'],
-  ['crap', 'cr*p'],
-];
+import { VALEXY, VALEXY_STYLE } from './valexy';
 
 function pick<T>(arr: T[], last?: T): T {
-  if (!arr.length) return '' as T;
+  if (!arr?.length) return '' as T;
   const pool = last ? arr.filter((x) => x !== last) : arr;
   const list = pool.length ? pool : arr;
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function emojis(n = 1): string {
-  const out: string[] = [];
-  for (let i = 0; i < n; i++) out.push(pick(VIBE_EMOJI));
-  return out.join('');
-}
-
-function maybeCensor(line: string): string {
+/** Apply Valexy’s real typo words without making every line identical. */
+function valexyTypos(line: string): string {
   let out = line;
-  for (const [raw, cut] of CENSOR) {
-    if (out.toLowerCase().includes(raw)) {
-      out = out.replace(new RegExp(raw, 'gi'), cut);
-      break;
+  for (const [from, to] of VALEXY.typos) {
+    if (Math.random() < 0.45) {
+      out = out.replace(new RegExp(`\\b${from}\\b`, 'i'), to);
     }
   }
   return out;
 }
 
-/**
- * Humanize: mixed casing, emoji slap, filler word, trailing emoji burst.
- * Not every line gets every treatment — variety is the point.
- */
 function humanize(line: string): string {
-  let out = maybeCensor(line.trim());
+  let out = valexyTypos(line.trim());
   const r = Math.random();
 
-  if (r < 0.35) out = `${out} ${emojis(1)}`;
-  if (r > 0.55 && r < 0.75) out = `${out} ${emojis(2)}`;
-  if (r > 0.85) out = `${pick(FILLERS)} ${out}`;
-  if (r < 0.12) out = out.replace(/\.(\s|$)/, ' ');
-  if (r > 0.9 && out.length < 60) out = out.toUpperCase();
-  // occasional double space / missing punctuation — typed on a phone
-  if (Math.random() < 0.08) out = out.replace(/,\s/, '  ');
+  // trailing dots like "girl.." / "just for now..."
+  if (r < 0.3 && !/\.{2,}$/.test(out) && !out.endsWith('..')) {
+    if (out.length > 30) out = `${out}...`;
+    else out = `${out}..`;
+  }
+  // occasional mid-thought ellipsis already in corpus; add a soft trail
+  if (r > 0.8 && out.length > 20 && !out.includes('...')) {
+    const cut = out.lastIndexOf(' ');
+    if (cut > 12) out = `${out.slice(0, cut)}...`;
+  }
+  if (r > 0.92) out = out.toUpperCase();
   return out;
-}
-
-/** Split a long thought into two chat bubbles worth of text sometimes. */
-function maybeSplit(line: string): string {
-  if (Math.random() > 0.2) return line;
-  const parts = line.split(/(?<=[.!?])\s+/);
-  if (parts.length < 2) return line;
-  return `${parts[0]} ${emojis(1)} ${parts.slice(1).join(' ')}`;
 }
 
 function brainOf(seed?: SeedProfile): MemberBrain {
   return (
     seed?.brain || {
-      voice: 'messy honest texter',
-      humor: 'chaotic',
-      never: 'polished essays',
-      style: 'short emotional bursts',
-      quirk: 'emoji slap after feelings',
-      openers: ['okay hi 😭 what made you swipe me', 'we matched?? mehn 😂 talk now'],
-      replies: ['wait say that again 💔', 'lol you’re funny 🤌 go on'],
-      questions: ['what are we doing this weekend tho 👀'],
-      topics: ['life', 'feelings'],
+      ...VALEXY_STYLE,
+      openers: VALEXY.openers,
+      replies: VALEXY.soft,
+      questions: VALEXY.questions,
+      topics: ['music', 'voice notes', 'food', 'night'],
     }
   );
 }
 
-function topicHit(text: string, seed?: SeedProfile): boolean {
-  const bag = [...(brainOf(seed).topics || []), ...(seed?.interests || []), '']
-    .join(' ')
-    .toLowerCase();
-  return bag.split(/\s+/).some((t) => t && text.includes(t.slice(0, 4)));
-}
-
-/** Raw text from a specific person's brain + Valexy pattern layer. */
+/**
+ * Combine her private brain banks with the shared Valexy corpus.
+ * Soft vs spicy tracks how deep the chat already is.
+ */
 export function replyFromBrain(
   seed: SeedProfile | undefined,
   userText: string,
@@ -97,58 +62,99 @@ export function replyFromBrain(
 ): string {
   const b = brainOf(seed);
   const text = userText.toLowerCase();
+  const deep = turnIndex >= 4 || /nasty|daddy|ride|moan|wild|location|kiss|touch/.test(text);
 
-  if (turnIndex === 0) return maybeSplit(humanize(pick(b.openers, lastLine)));
+  if (turnIndex === 0) return humanize(pick([...VALEXY.openers, ...b.openers], lastLine));
 
-  if (/\b(fuck|shit|wtf|stress|tired|sad|cry|break|ex)\b/.test(text)) {
+  if (/\b(sad|scared|alone|cry|thunder|lightning|ex|tired|stress|rough)\b/.test(text)) {
     return humanize(
       pick(
         [
-          'ai mehn 💔 come here, tell me everything',
-          'not that 🥲 we can talk tho, I’m here',
-          'f*CK whoever did that 😭 continue',
+          'ooh sorry about that 😔',
+          'i am here for you',
+          'Beb...come here 🫣',
+          'you sleep alone? 🥺 I get that',
+          pick(VALEXY.soft),
         ],
         lastLine
       )
     );
   }
 
-  if (/\b(love|marry|beautiful|cute|hot|babe|crush)\b/.test(text)) {
+  if (/\b(voice|song|sing|music|note|sounds)\b/.test(text)) {
     return humanize(
       pick(
         [
-          'ai stop 😂❤️ say more first',
-          'you’re moving too fast mehn 🤌 wait',
-          'okayyyy 🥺 but buy me food first',
+          'the voice 🥵🥵🥵...what did you take for lunch girl..??',
+          'marize🤤🎼',
+          "That's my favourite song tot for life",
+          'send that again...I need it 🫣',
         ],
         lastLine
       )
     );
   }
 
-  if (text.endsWith('?')) {
-    return maybeSplit(humanize(`${pick(b.replies, lastLine)} ${emojis(1)}`));
+  if (/\b(love|cute|beautiful|hot|pretty|blush|miss)\b/.test(text)) {
+    return humanize(
+      pick(
+        [
+          'Really 😊 you are making me blush',
+          "mmhnh🤫 flatter box 😂",
+          'wayy too sweet...stop it 🫣',
+          "you've completed my day girl..",
+        ],
+        lastLine
+      )
+    );
   }
 
-  if (/\b(hi|hey|hello|niaje|sasa|sup)\b/.test(text) && text.length < 20) {
-    return humanize(pick([pick(b.openers, lastLine), 'sasa 👋 you just say hi like that?'], lastLine));
+  if (/\b(nasty|daddy|master|good girl|wild|ride|moan|location|sexy|hot)\b/.test(text) || deep && Math.random() < 0.35) {
+    return humanize(
+      pick(
+        [
+          'yah🫣...but you are wayy too nastier😘',
+          'I mean for your age😏',
+          'Oky my apologies daddy or should I say master',
+          "Next time you will be saying yeaaa right there my good girl🔞😍",
+          "You're tempting me to push you past your limits, but I'll keep it just for now...",
+          'cant wait',
+          'Same here I’m going so wild right now',
+          'location 🤭',
+        ],
+        lastLine
+      )
+    );
+  }
+
+  if (/\b(hi|hey|sasa|niaje|hello)\b/.test(text) && text.length < 24) {
+    return humanize(pick([...VALEXY.openers, 'hey 🫣 how is you', 'Sasa 👀'], lastLine));
+  }
+
+  if (text.endsWith('?') || /\b(what|why|how|where|when)\b/.test(text)) {
+    return humanize(pick([...VALEXY.questions, ...b.questions], lastLine));
   }
 
   if (text.trim().length < 10) {
-    return humanize(pick(['that’s it?? 😭', 'talk to me mehn', 'and?? 👀', 'lol go on 🤌'], lastLine));
+    return humanize(pick([...VALEXY.short, 'go on...', 'and??', 'yah🫣'], lastLine));
   }
 
-  if (topicHit(text, seed) && Math.random() < 0.5) {
-    return maybeSplit(humanize(pick([...b.replies, ...b.questions], lastLine)));
+  if (Math.random() < 0.28) {
+    return humanize(pick([...VALEXY.questions, ...b.questions], lastLine));
   }
 
-  if (Math.random() < 0.3) return humanize(pick(b.questions, lastLine));
-  return maybeSplit(humanize(pick(b.replies, lastLine)));
+  // default: her soft / reaction banks mixed with this person’s brain
+  return humanize(
+    pick(
+      [...VALEXY.reactions, ...VALEXY.soft, ...b.replies],
+      lastLine
+    )
+  );
 }
 
 export function openerFromBrain(seedUid: string): string {
   const seed = findMember(seedUid) || SEED_PROFILES.find((s) => s.uid === seedUid);
-  return maybeSplit(humanize(pick(brainOf(seed).openers)));
+  return humanize(pick([...VALEXY.openers, ...brainOf(seed).openers]));
 }
 
 export async function botReply(
@@ -172,13 +178,18 @@ export async function botReply(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           persona: {
-            name: seed?.name || 'Member',
+            name: seed?.name || 'Dedra',
             age: seed?.age,
             city: seed?.location?.city,
             bio: seed?.bio,
             interests: seed?.interests,
-            brain: seed?.brain,
-            texting: 'instagram-dm-messy-kenyan',
+            brain: { ...VALEXY_STYLE, ...(seed?.brain || {}) },
+            sampleLines: [
+              ...VALEXY.openers.slice(0, 3),
+              ...VALEXY.soft.slice(0, 3),
+              ...VALEXY.flirty.slice(0, 2),
+              ...VALEXY.reactions.slice(0, 2),
+            ],
           },
           history: history.slice(-12),
           message: userText,
@@ -190,7 +201,7 @@ export async function botReply(
       return humanize(data.reply.slice(0, 400));
     }
   } catch {
-    // brain path
+    // local Valexy corpus
   }
 
   return replyFromBrain(seed, userText, turnIndex, lastBot);
